@@ -239,3 +239,5 @@ function processManualLyrics() {
     
     alert(`¡Canción de ${newSongData.length} líneas cargada con éxito!`);
 }
+// Añadir este nuevo Event Listener:
+loadLyricsButton.addEventListener('click', processManualLyrics);

@@ -178,3 +178,38 @@ h1 {
     color: #dc3545; 
     font-weight: bold;
 }
+/* --- Estilos para la Carga Manual de Letras --- */
+#manual-input-section {
+    padding: 15px;
+    background-color: #fff3cd; /* Amarillo suave */
+    border: 1px solid #ffc107;
+    margin: 15px;
+    border-radius: 8px;
+}
+
+#lyrics-input {
+    width: 100%;
+    min-height: 150px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+#load-lyrics-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff9f1c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.small-note {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 5px;
+}

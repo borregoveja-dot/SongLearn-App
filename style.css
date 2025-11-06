@@ -1,0 +1,180 @@
+/* Estilos Base y Reseteo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #5d5d81; /* Un morado oscuro/azul */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Estilos para el Botón de Traducción */
+#toggle-mode {
+    background-color: #ff9f1c; /* Naranja brillante */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#toggle-mode:hover {
+    background-color: #e08b1a;
+}
+
+/* Sección de Audio */
+#audio-input-section {
+    padding: 15px;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #ddd;
+}
+
+#youtube-url {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#load-video-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#youtube-player {
+    margin: 15px;
+}
+
+/* Estilos del Contenedor de Letras */
+#lyric-container {
+    padding: 20px 15px;
+}
+
+/* Estilos de las líneas de la canción */
+.lyric-line {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    cursor: pointer; 
+}
+
+.spanish-translation {
+    display: none; /* Oculto por defecto */
+    font-style: italic;
+    color: #888;
+    margin-top: 5px;
+    border-top: 1px dashed #eee;
+    padding-top: 5px;
+}
+
+/* Estilo para mostrar la traducción */
+.lyric-line.active .spanish-translation {
+    display: block;
+}
+
+/* --- ESTILOS DEL MODO JUEGO --- */
+
+#game-container {
+    padding: 15px;
+    background-color: #e6f7ff; 
+    border-radius: 10px;
+    margin: 20px 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#game-line {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff; 
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.missing-word {
+    color: #dc3545; 
+    text-decoration: underline;
+}
+
+#game-input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+#check-btn, #next-btn, #start-game-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#check-btn {
+    background-color: #28a745; 
+    color: white;
+}
+
+#next-btn {
+    background-color: #ffc107; 
+    color: #333;
+}
+
+#next-btn:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #6c757d;
+}
+
+#start-game-btn {
+    background-color: #007bff; 
+    color: white;
+    margin: 10px 15px;
+    width: calc(100% - 30px); 
+    display: block;
+}
+
+/* Retroalimentación */
+.feedback-text.correct {
+    color: #28a745; 
+    font-weight: bold;
+}
+
+.feedback-text.incorrect {
+    color: #dc3545; 
+    font-weight: bold;
+}

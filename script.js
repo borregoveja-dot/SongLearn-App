@@ -12,9 +12,11 @@ const toggleButton = document.getElementById('toggle-mode');
 let isTranslationMode = false;
 
 // --- Funciones de Traducción Interactiva ---
-function loadLyrics() {
-    lyricContainer.innerHTML = ''; 
-    songData.forEach((line, index) => {
+// MODIFICAR ESTA FUNCIÓN EN script.js
+function loadLyrics(dataArray = songData) { // Acepta dataArray o usa songData por defecto
+    lyricContainer.innerHTML = '';
+   // USAR dataArray aquí en lugar de songData
+    dataArray.forEach((line, index) => {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
@@ -194,3 +196,46 @@ userInput.addEventListener('keypress', function(e) {
         }
     }
 });
+// --- Funciones de Carga de Datos Manual ---
+const lyricsInput = document.getElementById('lyrics-input');
+const loadLyricsButton = document.getElementById('load-lyrics-btn');
+
+function processManualLyrics() {
+    const rawText = lyricsInput.value.trim();
+    if (!rawText) {
+        alert("Por favor, pega la letra de la canción y su traducción.");
+        return;
+    }
+
+    // 1. Divide el texto en líneas de canción
+    const rawLines = rawText.split('\n').filter(line => line.trim() !== '');
+
+    // 2. Procesa cada línea para obtener inglés y español
+    const newSongData = rawLines.map(rawLine => {
+        // Usa '$$' como separador entre la frase en inglés y la traducción
+        const parts = rawLine.split('$$'); 
+        
+        // Formato: { english: [Parte 0], spanish: [Parte 1] }
+        return {
+            english: (parts[0] || '').trim(),
+            spanish: (parts[1] || '').trim() || 'No se proporcionó traducción'
+        };
+    }).filter(line => line.english); // Solo incluye líneas que tengan texto en inglés
+
+    if (newSongData.length === 0) {
+        alert("No se pudo procesar la letra. Asegúrate de usar el formato: Inglés$$Traducción");
+        return;
+    }
+
+    // 3. Cargar la nueva letra en la aplicación
+    loadLyrics(newSongData); // Carga la traducción interactiva
+    currentGameIndex = 0; // Reinicia el juego
+    
+    // Ocultar el juego si estaba visible y mostrar la traducción interactiva
+    gameContainer.style.display = 'none'; 
+    lyricContainer.style.display = 'block';
+    startGameButton.style.display = 'block'; // Mostrar el botón de inicio del juego
+    toggleButton.style.display = 'block';
+    
+    alert(`¡Canción de ${newSongData.length} líneas cargada con éxito!`);
+}

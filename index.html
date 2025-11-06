@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SongLearn 🎶</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
     <header>
         <h1>SongLearn</h1>
@@ -12,12 +20,13 @@
 
     <div id="youtube-player">
         </div>
-<div id="manual-input-section">
-    <h2>📝 Carga Manual de Letra y Traducción</h2>
-    <textarea id="lyrics-input" placeholder="Pega la letra en inglés aquí. Cada línea debe estar separada por '$$' y seguida de la traducción en español.&#10;Ejemplo: Hello from the other side$$Hola desde el otro lado&#10;I must have called a thousand times$$Debo haber llamado mil veces"></textarea>
-    <button id="load-lyrics-btn">Cargar Nueva Canción</button>
-    <p class="small-note">La app usará esta letra en lugar de la codificada.</p>
-</div>
+
+    <div id="manual-input-section">
+        <h2>📝 Carga Manual de Letra y Traducción</h2>
+        <textarea id="lyrics-input" placeholder="Pega la letra en inglés y la traducción, separadas por $$.&#10;Ejemplo: There's a fire starting in my heart$$Hay un fuego encendiéndose en mi corazón&#10;The scars of your love remind me of us$$Las cicatrices de tu amor me recuerdan a nosotros"></textarea>
+        <button id="load-lyrics-btn">Cargar Nueva Canción</button>
+        <p class="small-note">La aplicación usará esta letra en lugar de la codificada.</p>
+    </div>
     <main id="lyric-container">
         </main>
     

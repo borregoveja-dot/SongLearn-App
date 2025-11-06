@@ -1,5 +1,4 @@
 // --- 1. Datos de la canción (Inicialmente simulados) ---
-// Usamos 'let' para poder actualizar estos datos con la carga manual
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
@@ -14,7 +13,7 @@ let isTranslationMode = false;
 
 // --- Funciones de Traducción Interactiva ---
 function loadLyrics(dataArray = currentSongData) { 
-    currentSongData = dataArray; // ¡Actualiza los datos para toda la aplicación!
+    currentSongData = dataArray; // Actualiza los datos para toda la aplicación
     lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
@@ -22,12 +21,12 @@ function loadLyrics(dataArray = currentSongData) {
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
 
-        // Crea el texto en inglés (usa <p> para forzar el salto de línea)
+        // Crea el texto en inglés
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
 
-        // Crea la traducción en español (usa <p> para forzar el salto de línea)
+        // Crea la traducción en español
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;
@@ -94,48 +93,53 @@ function loadYouTubeVideo() {
     }
 }
 
-// --- Funciones de Carga de Datos Manual (SOLUCIÓN FINAL) ---
-const lyricsInput = document.getElementById('lyrics-input');
+// --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
+const combinedLyricsInput = document.getElementById('combined-lyrics-input');
 const loadLyricsButton = document.getElementById('load-lyrics-btn');
 
 function processManualLyrics() {
-    const rawText = lyricsInput.value.trim();
+    const rawText = combinedLyricsInput.value.trim();
+
     if (!rawText) {
-        alert("Por favor, pega la letra de la canción y su traducción.");
+        alert("Por favor, pega la letra completa en el campo de texto.");
         return;
     }
 
-    // 1. Divide el texto por cada salto de línea (renglón)
-    const rawLines = rawText.split('\n').filter(line => line.trim() !== '');
+    // 1. Divide el texto por saltos de línea y elimina líneas vacías
+    const allLines = rawText.split('\n').filter(line => line.trim() !== '');
 
-    // 2. Procesa cada línea
-    const newSongData = rawLines.map(rawLine => {
-        // Usa '$$' como separador 
-        const parts = rawLine.split('$$'); 
-        
-        // El primer elemento es inglés, el segundo es español.
-        return {
-            english: (parts[0] || '').trim(),
-            spanish: (parts[1] || '').trim() || 'No se proporcionó traducción'
-        };
-    }).filter(line => line.english && line.spanish); // Filtra líneas incompletas
+    if (allLines.length % 2 !== 0) {
+        alert("Error: El número total de líneas debe ser PAR (Español, Inglés, Español, Inglés...). Por favor, verifica que no falte la última traducción o letra.");
+        return;
+    }
+
+    const newSongData = [];
+    
+    // 2. Itera y empareja las líneas: [i] es Español, [i+1] es Inglés
+    for (let i = 0; i < allLines.length; i += 2) {
+        newSongData.push({
+            // El primer elemento (posición impar) es Español
+            spanish: (allLines[i] || '').trim(), 
+            // El segundo elemento (posición par) es Inglés
+            english: (allLines[i + 1] || '').trim() 
+        });
+    }
 
     if (newSongData.length === 0) {
-        alert("No se pudo procesar la letra. Asegúrate de que cada línea tenga texto en Inglés Y la Traducción, separados por $$.");
+        alert("No se pudo procesar la letra. Asegúrate de que los campos no estén vacíos.");
         return;
     }
 
-    // 3. Cargar la nueva letra en la aplicación
+    // 3. Cargar la nueva letra y reiniciar la interfaz
     loadLyrics(newSongData); 
-    currentGameIndex = 0; // Reinicia el juego
+    currentGameIndex = 0; 
     
-    // Configura la interfaz de vuelta al modo Traducción
     gameContainer.style.display = 'none'; 
     lyricContainer.style.display = 'block';
     startGameButton.style.display = 'block'; 
     toggleButton.style.display = 'block';
     
-    alert(`¡Canción de ${newSongData.length} líneas cargada con éxito!`);
+    alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
 
 

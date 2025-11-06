@@ -22,12 +22,12 @@ function loadLyrics(dataArray = currentSongData) {
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
 
-        // Crea el texto en inglés
+        // Crea el texto en inglés (usa <p> para forzar el salto de línea)
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
 
-        // Crea la traducción en español
+        // Crea la traducción en español (usa <p> para forzar el salto de línea)
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;

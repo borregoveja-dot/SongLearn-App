@@ -9,7 +9,7 @@ body {
 }
 
 header {
-    background-color: #5d5d81; /* Un morado oscuro/azul */
+    background-color: #5d5d81; 
     color: white;
     padding: 20px;
     text-align: center;
@@ -26,7 +26,7 @@ h1 {
 
 /* Estilos para el Botón de Traducción */
 #toggle-mode {
-    background-color: #ff9f1c; /* Naranja brillante */
+    background-color: #ff9f1c; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -70,10 +70,10 @@ h1 {
     margin: 15px;
 }
 
-/* --- ESTILOS PARA LA CARGA MANUAL (CORREGIDOS) --- */
+/* --- ESTILOS PARA LA CARGA MANUAL --- */
 #manual-input-section {
     padding: 15px;
-    background-color: #fff3cd; /* Amarillo suave */
+    background-color: #fff3cd; 
     border: 1px solid #ffc107;
     margin: 15px;
     border-radius: 8px;
@@ -93,7 +93,8 @@ h1 {
     border: 1px solid #ffc107;
     border-radius: 4px;
     margin-bottom: 10px;
-    font-family: monospace; /* Para mejor lectura del formato */
+    font-family: monospace;
+    white-space: pre-wrap; /* Asegura que se vea bien el ejemplo */
 }
 
 #load-lyrics-btn {

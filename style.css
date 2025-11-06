@@ -129,6 +129,13 @@ h1 {
     cursor: pointer; 
 }
 
+/* Asegura que el texto en inglés y español tomen todo el ancho y se separen */
+.english-text, .spanish-translation {
+    margin: 0; /* Elimina el margen por defecto de <p> */
+    padding: 0;
+    display: block; /* Fuerza a tomar todo el ancho, garantizando el salto */
+}
+
 .spanish-translation {
     display: none; 
     font-style: italic;

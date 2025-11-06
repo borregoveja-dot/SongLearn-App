@@ -85,7 +85,7 @@ h1 {
     margin-bottom: 10px;
 }
 
-#lyrics-input {
+#combined-lyrics-input {
     width: 100%;
     min-height: 150px;
     padding: 10px;
@@ -94,7 +94,7 @@ h1 {
     border-radius: 4px;
     margin-bottom: 10px;
     font-family: monospace;
-    white-space: pre-wrap; /* Asegura que se vea bien el ejemplo */
+    white-space: pre-wrap; 
 }
 
 #load-lyrics-btn {
@@ -131,9 +131,9 @@ h1 {
 
 /* Asegura que el texto en inglés y español tomen todo el ancho y se separen */
 .english-text, .spanish-translation {
-    margin: 0; /* Elimina el margen por defecto de <p> */
+    margin: 0; 
     padding: 0;
-    display: block; /* Fuerza a tomar todo el ancho, garantizando el salto */
+    display: block; 
 }
 
 .spanish-translation {

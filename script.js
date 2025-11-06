@@ -93,19 +93,20 @@ function loadYouTubeVideo() {
     }
 }
 
-// --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
+// --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL Y ROBUSTA) ---
 const combinedLyricsInput = document.getElementById('combined-lyrics-input');
 const loadLyricsButton = document.getElementById('load-lyrics-btn');
 
 function processManualLyrics() {
-    const rawText = combinedLyricsInput.value.trim();
-
+    // 1. Obtiene el texto y lo limpia. Usa un regex para manejar diferentes tipos de saltos de línea.
+    const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
+    
     if (!rawText) {
         alert("Por favor, pega la letra completa en el campo de texto.");
         return;
     }
 
-    // 1. Divide el texto por saltos de línea y elimina líneas vacías
+    // 2. Divide el texto por el salto de línea '\n' y elimina líneas vacías
     const allLines = rawText.split('\n').filter(line => line.trim() !== '');
 
     if (allLines.length % 2 !== 0) {
@@ -115,7 +116,7 @@ function processManualLyrics() {
 
     const newSongData = [];
     
-    // 2. Itera y empareja las líneas: [i] es Español, [i+1] es Inglés
+    // 3. Itera y empareja las líneas: [i] es Español, [i+1] es Inglés
     for (let i = 0; i < allLines.length; i += 2) {
         newSongData.push({
             // El primer elemento (posición impar) es Español
@@ -130,10 +131,11 @@ function processManualLyrics() {
         return;
     }
 
-    // 3. Cargar la nueva letra y reiniciar la interfaz
+    // 4. ¡Cargar la nueva letra y reiniciar la interfaz!
     loadLyrics(newSongData); 
     currentGameIndex = 0; 
     
+    // Configura la interfaz de vuelta al modo Traducción
     gameContainer.style.display = 'none'; 
     lyricContainer.style.display = 'block';
     startGameButton.style.display = 'block'; 

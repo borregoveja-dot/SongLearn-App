@@ -22,10 +22,12 @@
         </div>
 
     <div id="manual-input-section">
-        <h2>📝 Carga Manual de Letra y Traducción</h2>
-        <textarea id="lyrics-input" placeholder="Pega la letra en inglés y la traducción, separadas por $$. Cada línea debe ir en un renglón.&#10;Ejemplo: Hello from the other side$$Hola desde el otro lado&#10;I must have called a thousand times$$Debo haber llamado mil veces"></textarea>
+        <h2>📝 Carga Automática de Letras</h2>
+        <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco. La app hará la separación automáticamente.</p>
+        
+        <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí (Español, Inglés, Español, Inglés...).&#10;Ejemplo:&#10;Cuando miro tus ojos&#10;When I look into your eyes&#10;Puedo ver un amor contenido&#10;I can see a love restrained"></textarea>
+        
         <button id="load-lyrics-btn">Cargar Nueva Canción</button>
-        <p class="small-note">La aplicación usará esta letra para la traducción y el juego.</p>
     </div>
     <main id="lyric-container">
         </main>

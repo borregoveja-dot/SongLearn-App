@@ -1,4 +1,5 @@
 // --- 1. Datos de la canción (Inicialmente simulados) ---
+// Usamos 'let' para poder actualizar estos datos con la carga manual
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
@@ -12,9 +13,8 @@ const toggleButton = document.getElementById('toggle-mode');
 let isTranslationMode = false;
 
 // --- Funciones de Traducción Interactiva ---
-// CORRECCIÓN: Ahora usa 'currentSongData' por defecto, pero acepta nuevos datos
 function loadLyrics(dataArray = currentSongData) { 
-    currentSongData = dataArray; // Actualiza los datos que usa el juego
+    currentSongData = dataArray; // ¡Actualiza los datos para toda la aplicación!
     lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
@@ -22,10 +22,12 @@ function loadLyrics(dataArray = currentSongData) {
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
 
+        // Crea el texto en inglés
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
 
+        // Crea la traducción en español
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;
@@ -92,7 +94,7 @@ function loadYouTubeVideo() {
     }
 }
 
-// --- Funciones de Carga de Datos Manual (CORREGIDAS) ---
+// --- Funciones de Carga de Datos Manual (SOLUCIÓN FINAL) ---
 const lyricsInput = document.getElementById('lyrics-input');
 const loadLyricsButton = document.getElementById('load-lyrics-btn');
 
@@ -103,25 +105,28 @@ function processManualLyrics() {
         return;
     }
 
+    // 1. Divide el texto por cada salto de línea (renglón)
     const rawLines = rawText.split('\n').filter(line => line.trim() !== '');
 
+    // 2. Procesa cada línea
     const newSongData = rawLines.map(rawLine => {
         // Usa '$$' como separador 
         const parts = rawLine.split('$$'); 
         
+        // El primer elemento es inglés, el segundo es español.
         return {
             english: (parts[0] || '').trim(),
             spanish: (parts[1] || '').trim() || 'No se proporcionó traducción'
         };
-    }).filter(line => line.english);
+    }).filter(line => line.english && line.spanish); // Filtra líneas incompletas
 
     if (newSongData.length === 0) {
-        alert("No se pudo procesar la letra. Asegúrate de usar el formato: Inglés$$Traducción");
+        alert("No se pudo procesar la letra. Asegúrate de que cada línea tenga texto en Inglés Y la Traducción, separados por $$.");
         return;
     }
 
     // 3. Cargar la nueva letra en la aplicación
-    loadLyrics(newSongData); // Carga la traducción interactiva
+    loadLyrics(newSongData); 
     currentGameIndex = 0; // Reinicia el juego
     
     // Configura la interfaz de vuelta al modo Traducción
@@ -130,8 +135,9 @@ function processManualLyrics() {
     startGameButton.style.display = 'block'; 
     toggleButton.style.display = 'block';
     
-    alert(`¡Canción de ${newSongData.length} líneas cargada con éxito! Ahora puedes empezar el juego.`);
+    alert(`¡Canción de ${newSongData.length} líneas cargada con éxito!`);
 }
+
 
 // --- Funciones de Modo Juego ---
 let currentGameIndex = 0;
@@ -149,12 +155,14 @@ gameContainer.style.display = 'none';
 
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
+    // Intentamos ocultar palabras de más de 3 letras para que sea interesante
     const longWords = words.filter(word => word.length > 3);
     if (longWords.length === 0) return { hiddenLine: line.english, missingWord: '' };
 
     const randomIndex = Math.floor(Math.random() * longWords.length);
     const wordToHide = longWords[randomIndex];
     
+    // Reemplaza la palabra entera por el hueco
     const regex = new RegExp(`\\b${wordToHide}\\b`);
     const hiddenLine = line.english.replace(regex, '___');
 
@@ -162,7 +170,7 @@ function chooseRandomWord(line) {
 }
 
 function loadGameLine() {
-    if (currentGameIndex >= currentSongData.length) { // Usa currentSongData
+    if (currentGameIndex >= currentSongData.length) { 
         gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
         userInput.disabled = true;
         checkButton.disabled = true;
@@ -171,7 +179,7 @@ function loadGameLine() {
         return;
     }
     
-    const currentLine = currentSongData[currentGameIndex]; // Usa currentSongData
+    const currentLine = currentSongData[currentGameIndex]; 
     const { hiddenLine, missingWord } = chooseRandomWord(currentLine);
     
     currentMissingWord = missingWord.toLowerCase();
@@ -194,7 +202,7 @@ function checkAnswer() {
         nextButton.disabled = false; 
         userInput.disabled = true;
         
-        gameLineDiv.innerHTML = currentSongData[currentGameIndex].english; // Usa currentSongData
+        gameLineDiv.innerHTML = currentSongData[currentGameIndex].english; 
     } else {
         feedbackElement.textContent = "Incorrecto. ❌ Inténtalo de nuevo.";
         feedbackElement.classList.remove('correct');

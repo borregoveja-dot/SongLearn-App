@@ -1,0 +1,39 @@
+<body>
+    <header>
+        <h1>SongLearn</h1>
+        <button id="toggle-mode">Mostrar Traducción Total</button>
+    </header>
+
+    <div id="audio-input-section">
+        <h2>🎵 Enlace de YouTube</h2>
+        <input type="text" id="youtube-url" placeholder="Pega aquí el enlace de YouTube de la canción">
+        <button id="load-video-btn">Cargar Música</button>
+    </div>
+
+    <div id="youtube-player">
+        </div>
+
+    <main id="lyric-container">
+        </main>
+    
+    <div id="game-container">
+        <h2>🎯 Modo Juego: Completa la Frase</h2>
+        <div id="game-line" class="lyric-line">
+            </div>
+        
+        <div id="game-input-area">
+            <input type="text" id="user-input" placeholder="Escribe la palabra que falta aquí">
+            <button id="check-btn">Verificar</button>
+            <button id="next-btn" disabled>Siguiente</button>
+        </div>
+        
+        <p id="feedback" class="feedback-text"></p>
+    </div>
+
+    <div id="controls">
+        <button id="start-game-btn">Empezar Juego</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

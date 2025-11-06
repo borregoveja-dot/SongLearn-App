@@ -1,5 +1,5 @@
 // --- 1. Datos de la canción (Inicialmente simulados) ---
-const songData = [
+let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
     { english: "I heard the sound of silence", spanish: "Escuché el sonido del silencio" },
@@ -12,11 +12,12 @@ const toggleButton = document.getElementById('toggle-mode');
 let isTranslationMode = false;
 
 // --- Funciones de Traducción Interactiva ---
-// MODIFICAR ESTA FUNCIÓN EN script.js
-function loadLyrics(dataArray = songData) { // Acepta dataArray o usa songData por defecto
-    lyricContainer.innerHTML = '';
-   // USAR dataArray aquí en lugar de songData
-    dataArray.forEach((line, index) => {
+// CORRECCIÓN: Ahora usa 'currentSongData' por defecto, pero acepta nuevos datos
+function loadLyrics(dataArray = currentSongData) { 
+    currentSongData = dataArray; // Actualiza los datos que usa el juego
+    lyricContainer.innerHTML = ''; 
+    
+    currentSongData.forEach((line, index) => {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
@@ -91,6 +92,47 @@ function loadYouTubeVideo() {
     }
 }
 
+// --- Funciones de Carga de Datos Manual (CORREGIDAS) ---
+const lyricsInput = document.getElementById('lyrics-input');
+const loadLyricsButton = document.getElementById('load-lyrics-btn');
+
+function processManualLyrics() {
+    const rawText = lyricsInput.value.trim();
+    if (!rawText) {
+        alert("Por favor, pega la letra de la canción y su traducción.");
+        return;
+    }
+
+    const rawLines = rawText.split('\n').filter(line => line.trim() !== '');
+
+    const newSongData = rawLines.map(rawLine => {
+        // Usa '$$' como separador 
+        const parts = rawLine.split('$$'); 
+        
+        return {
+            english: (parts[0] || '').trim(),
+            spanish: (parts[1] || '').trim() || 'No se proporcionó traducción'
+        };
+    }).filter(line => line.english);
+
+    if (newSongData.length === 0) {
+        alert("No se pudo procesar la letra. Asegúrate de usar el formato: Inglés$$Traducción");
+        return;
+    }
+
+    // 3. Cargar la nueva letra en la aplicación
+    loadLyrics(newSongData); // Carga la traducción interactiva
+    currentGameIndex = 0; // Reinicia el juego
+    
+    // Configura la interfaz de vuelta al modo Traducción
+    gameContainer.style.display = 'none'; 
+    lyricContainer.style.display = 'block';
+    startGameButton.style.display = 'block'; 
+    toggleButton.style.display = 'block';
+    
+    alert(`¡Canción de ${newSongData.length} líneas cargada con éxito! Ahora puedes empezar el juego.`);
+}
+
 // --- Funciones de Modo Juego ---
 let currentGameIndex = 0;
 let currentMissingWord = '';
@@ -120,7 +162,7 @@ function chooseRandomWord(line) {
 }
 
 function loadGameLine() {
-    if (currentGameIndex >= songData.length) {
+    if (currentGameIndex >= currentSongData.length) { // Usa currentSongData
         gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
         userInput.disabled = true;
         checkButton.disabled = true;
@@ -129,7 +171,7 @@ function loadGameLine() {
         return;
     }
     
-    const currentLine = songData[currentGameIndex];
+    const currentLine = currentSongData[currentGameIndex]; // Usa currentSongData
     const { hiddenLine, missingWord } = chooseRandomWord(currentLine);
     
     currentMissingWord = missingWord.toLowerCase();
@@ -152,7 +194,7 @@ function checkAnswer() {
         nextButton.disabled = false; 
         userInput.disabled = true;
         
-        gameLineDiv.innerHTML = songData[currentGameIndex].english;
+        gameLineDiv.innerHTML = currentSongData[currentGameIndex].english; // Usa currentSongData
     } else {
         feedbackElement.textContent = "Incorrecto. ❌ Inténtalo de nuevo.";
         feedbackElement.classList.remove('correct');
@@ -180,6 +222,9 @@ loadLyrics();
 toggleButton.addEventListener('click', toggleFullTranslationMode);
 loadButton.addEventListener('click', loadYouTubeVideo);
 
+// ACTIVACIÓN DEL BOTÓN DE CARGA MANUAL:
+loadLyricsButton.addEventListener('click', processManualLyrics); 
+
 // Eventos del juego
 startGameButton.addEventListener('click', startGame);
 checkButton.addEventListener('click', checkAnswer);
@@ -196,48 +241,3 @@ userInput.addEventListener('keypress', function(e) {
         }
     }
 });
-// --- Funciones de Carga de Datos Manual ---
-const lyricsInput = document.getElementById('lyrics-input');
-const loadLyricsButton = document.getElementById('load-lyrics-btn');
-
-function processManualLyrics() {
-    const rawText = lyricsInput.value.trim();
-    if (!rawText) {
-        alert("Por favor, pega la letra de la canción y su traducción.");
-        return;
-    }
-
-    // 1. Divide el texto en líneas de canción
-    const rawLines = rawText.split('\n').filter(line => line.trim() !== '');
-
-    // 2. Procesa cada línea para obtener inglés y español
-    const newSongData = rawLines.map(rawLine => {
-        // Usa '$$' como separador entre la frase en inglés y la traducción
-        const parts = rawLine.split('$$'); 
-        
-        // Formato: { english: [Parte 0], spanish: [Parte 1] }
-        return {
-            english: (parts[0] || '').trim(),
-            spanish: (parts[1] || '').trim() || 'No se proporcionó traducción'
-        };
-    }).filter(line => line.english); // Solo incluye líneas que tengan texto en inglés
-
-    if (newSongData.length === 0) {
-        alert("No se pudo procesar la letra. Asegúrate de usar el formato: Inglés$$Traducción");
-        return;
-    }
-
-    // 3. Cargar la nueva letra en la aplicación
-    loadLyrics(newSongData); // Carga la traducción interactiva
-    currentGameIndex = 0; // Reinicia el juego
-    
-    // Ocultar el juego si estaba visible y mostrar la traducción interactiva
-    gameContainer.style.display = 'none'; 
-    lyricContainer.style.display = 'block';
-    startGameButton.style.display = 'block'; // Mostrar el botón de inicio del juego
-    toggleButton.style.display = 'block';
-    
-    alert(`¡Canción de ${newSongData.length} líneas cargada con éxito!`);
-}
-// Añadir este nuevo Event Listener:
-loadLyricsButton.addEventListener('click', processManualLyrics);

@@ -70,14 +70,14 @@ h1 {
     margin: 15px;
 }
 
-/* --- ESTILOS PARA LA CARGA MANUAL --- */
+/* --- ESTILOS PARA LA CARGA MANUAL (Visible por defecto) --- */
 #manual-input-section {
     padding: 15px;
     background-color: #fff3cd; 
     border: 1px solid #ffc107;
     margin: 15px;
     border-radius: 8px;
-    display: block !important; /* CORRECCIÓN: Visible por defecto */
+    display: block !important; 
 }
 
 #manual-input-section h2 {
@@ -115,13 +115,13 @@ h1 {
     margin-top: 5px;
 }
 
-/* --- ESTILOS PARA EL MODO ENFOQUE --- */
+/* --- ESTILOS PARA EL MODO ENFOQUE (Visible por defecto) --- */
 
 #active-line-container {
     padding: 30px 20px;
     text-align: center;
     min-height: 250px; 
-    display: flex; /* CORRECCIÓN: Visible por defecto */
+    display: flex !important; 
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -188,7 +188,7 @@ h1 {
     border-radius: 10px;
     margin: 20px 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: none !important; /* Ocultar juego al inicio */
+    display: none !important; 
 }
 
 #game-line {

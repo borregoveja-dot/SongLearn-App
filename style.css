@@ -1,231 +1,64 @@
-/* Estilos Base y Reseteo */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-}
+/* --- NUEVOS ESTILOS PARA MODO ENFOQUE DE LÍNEA --- */
 
-header {
-    background-color: #5d5d81; 
-    color: white;
-    padding: 20px;
+#active-line-container {
+    padding: 30px 20px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    min-height: 250px; /* Para que siempre haya espacio */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-h1 {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-/* Estilos para el Botón de Traducción */
-#toggle-mode {
-    background-color: #ff9f1c; 
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-#toggle-mode:hover {
-    background-color: #e08b1a;
-}
-
-/* Sección de Audio */
-#audio-input-section {
-    padding: 15px;
-    background-color: #e9ecef;
-    border-bottom: 1px solid #ddd;
-}
-
-#youtube-url {
+#focused-line {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    max-width: 600px;
+    text-align: left;
 }
 
-#load-video-btn {
-    width: 100%;
-    padding: 10px;
+#focused-line p {
+    margin: 10px 0;
+    font-size: 1.8em; /* Letra mucho más grande */
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+#focused-line .translation-focus {
+    font-size: 1.2em; /* Traducción un poco más pequeña */
+    font-style: italic;
+    color: #5d5d81; /* Morado del header */
+    margin-top: 10px;
+    font-weight: normal;
+}
+
+/* Controles de Playback/Navegación */
+#playback-controls {
+    display: flex;
+    gap: 15px;
+}
+
+#playback-controls button {
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 50%; /* Botones circulares */
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-#youtube-player {
-    margin: 15px;
+#playback-controls button:hover {
+    background-color: #0056b3;
 }
 
-/* --- ESTILOS PARA LA CARGA MANUAL --- */
-#manual-input-section {
-    padding: 15px;
-    background-color: #fff3cd; 
-    border: 1px solid #ffc107;
-    margin: 15px;
-    border-radius: 8px;
-}
-
-#manual-input-section h2 {
-    margin-top: 0;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-#combined-lyrics-input {
-    width: 100%;
-    min-height: 150px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ffc107;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    white-space: pre-wrap; 
-}
-
-#load-lyrics-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #ff9f1c;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.small-note {
-    font-size: 0.8em;
-    color: #6c757d;
-    margin-top: 5px;
-}
-
-/* Estilos del Contenedor de Letras */
+/* Ocultar el contenedor de letras viejas que ya no usamos */
 #lyric-container {
-    padding: 20px 15px;
-}
-
-/* Estilos de las líneas de la canción */
-.lyric-line {
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    cursor: pointer; 
-}
-
-/* Asegura que el texto en inglés y español tomen todo el ancho y se separen */
-.english-text, .spanish-translation {
-    margin: 0; 
-    padding: 0;
-    display: block; 
-}
-
-.spanish-translation {
-    display: none; 
-    font-style: italic;
-    color: #888;
-    margin-top: 5px;
-    border-top: 1px dashed #eee;
-    padding-top: 5px;
-}
-
-/* Estilo para mostrar la traducción */
-.lyric-line.active .spanish-translation {
-    display: block;
-}
-
-/* --- ESTILOS DEL MODO JUEGO --- */
-
-#game-container {
-    padding: 15px;
-    background-color: #e6f7ff; 
-    border-radius: 10px;
-    margin: 20px 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-#game-line {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #007bff; 
-    background-color: white;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-.missing-word {
-    color: #dc3545; 
-    text-decoration: underline;
-}
-
-#game-input-area {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-#user-input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-}
-
-#check-btn, #next-btn, #start-game-btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#check-btn {
-    background-color: #28a745; 
-    color: white;
-}
-
-#next-btn {
-    background-color: #ffc107; 
-    color: #333;
-}
-
-#next-btn:disabled {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-    color: #6c757d;
-}
-
-#start-game-btn {
-    background-color: #007bff; 
-    color: white;
-    margin: 10px 15px;
-    width: calc(100% - 30px); 
-    display: block;
-}
-
-/* Retroalimentación */
-.feedback-text.correct {
-    color: #28a745; 
-    font-weight: bold;
-}
-
-.feedback-text.incorrect {
-    color: #dc3545; 
-    font-weight: bold;
+    display: none !important; 
 }

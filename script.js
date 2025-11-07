@@ -11,121 +11,91 @@ let isTranslationMode = false;
 let currentLineIndex = 0; 
 let currentGameIndex = 0;
 let currentMissingWord = '';
-
-// Se inicializa en la API de YouTube
 let youtubePlayerInstance = null; 
 
-// ------------------------------------------------------------------------------------------------
-// --- FUNCIONES CENTRALES Y DE INTERFAZ ---
-// ------------------------------------------------------------------------------------------------
-
+// --- Funciones de Interfaz (Omitidas para brevedad, son las mismas) ---
+// ...
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray;
     const lyricContainer = document.getElementById('lyric-container');
-    
     if (lyricContainer) lyricContainer.innerHTML = ''; 
-    
     currentSongData.forEach((line, index) => {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
-
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
-
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;
-
         lineDiv.appendChild(englishP);
         lineDiv.appendChild(spanishP);
-        
         if (lyricContainer) lyricContainer.appendChild(lineDiv);
-
         lineDiv.addEventListener('click', toggleTranslation);
     });
 }
-
 function toggleTranslation(event) {
     if (isTranslationMode) return; 
     event.currentTarget.classList.toggle('active');
 }
-
 function toggleFullTranslationMode() {
     const toggleButton = document.getElementById('toggle-mode');
     const activeLineContainer = document.getElementById('active-line-container');
     const lyricContainer = document.getElementById('lyric-container');
-
     if (activeLineContainer && activeLineContainer.style.display !== 'none') {
-        // Modo Enfoque -> Traducción Total
         activeLineContainer.style.display = 'none';
         if (lyricContainer) lyricContainer.style.display = 'block';
         if (toggleButton) toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
     } else if (activeLineContainer) {
-        // Traducción Total -> Modo Enfoque
         if (lyricContainer) lyricContainer.style.display = 'none';
         activeLineContainer.style.display = 'flex';
         if (toggleButton) toggleButton.textContent = "Mostrar Traducción Total";
         isTranslationMode = false;
     }
 }
-
-// --- Modo Enfoque y Navegación ---
 function renderFocusedLine() {
     const focusedLineDiv = document.getElementById('focused-line');
-    
     if (currentSongData.length === 0 || !focusedLineDiv) {
         if (focusedLineDiv) focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
         return;
     }
-    
     if (currentLineIndex < 0) currentLineIndex = 0;
-    
     if (currentLineIndex >= currentSongData.length) { 
         currentLineIndex = currentSongData.length;
         focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
         return;
     }
-
     const line = currentSongData[currentLineIndex];
-
-    focusedLineDiv.innerHTML = `
-        <p class="english-focus">${line.english}</p>
-        <p class="translation-focus">${line.spanish}</p>
-    `;
+    focusedLineDiv.innerHTML = `<p class="english-focus">${line.english}</p><p class="translation-focus">${line.spanish}</p>`;
 }
-
 function nextLine() {
     if (currentLineIndex < currentSongData.length) {
         currentLineIndex++;
         renderFocusedLine();
     }
 }
-
 function prevLine() {
     if (currentLineIndex > 0) {
         currentLineIndex--;
         renderFocusedLine();
     }
 }
-
 function repeatLine() {
     alert("Funcionalidad de Repetición del Video (API de YouTube) aún no implementada."); 
 }
 
-
 // ------------------------------------------------------------------------------------------------
-// --- INTEGRACIÓN DE AUDIO (SOLUCIÓN DE SINCRONIZACIÓN DE API) ---
+// --- INTEGRACIÓN DE AUDIO (SOLUCIÓN FINAL DE SINCRONIZACIÓN DE API) ---
 // ------------------------------------------------------------------------------------------------
 
-// Funnción que la API de YouTube llama cuando su SDK está listo.
+// *Función Global requerida por la API de YouTube (DEBE ESTAR FUERA DEL DOMContentLoaded)*
 window.onYouTubeIframeAPIReady = function() {
-    // Ya que la API está lista, podemos llamar a la función para cargar el video.
-    // Pero la llamaremos solo cuando el usuario haga clic en 'Cargar Música'.
     console.log("YouTube API Ready.");
+    // No hacemos nada aquí, solo esperamos que el usuario presione Cargar Música
 };
+
 
 function getYouTubeVideoId(url) {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\?v=)|youtu\.be\/)([^&]+)/;
@@ -139,8 +109,15 @@ function loadYouTubeVideo() {
     const playerContainer = document.getElementById('youtube-player');
     const videoId = getYouTubeVideoId(urlInput.value);
 
-    if (videoId && playerContainer && typeof YT !== 'undefined' && YT.Player) {
-        
+    // 1. Verificar la URL y el Contenedor
+    if (!videoId || !playerContainer) {
+        alert("Por favor, introduce una URL de YouTube válida.");
+        if (playerContainer) playerContainer.innerHTML = '';
+        return;
+    }
+    
+    // 2. Esperar la API y Cargar
+    if (typeof YT !== 'undefined' && YT.Player) {
         playerContainer.innerHTML = `<div id="youtube-iframe"></div>`;
         playerContainer.style.marginBottom = '20px'; 
         
@@ -156,12 +133,9 @@ function loadYouTubeVideo() {
                 'onStateChange': onPlayerStateChange
             }
         });
-
-    } else if (!playerContainer) {
-        // Fallo seguro si no se encuentra el contenedor
-        alert("Error interno al encontrar el contenedor del reproductor.");
     } else {
-        alert("Error: La API de YouTube no está lista o la URL es inválida. Intente recargar la página.");
+        alert("Error de Conexión: La API de YouTube no está disponible. Intente recargar la página.");
+        console.error("YT object not found. YouTube API failed to load.");
     }
 }
 
@@ -187,7 +161,6 @@ function togglePlayPause() {
 // FUNCIÓN PARA SINCRONIZAR EL ÍCONO DEL BOTÓN PAUSA/PLAY CON EL ESTADO DEL VIDEO
 function onPlayerStateChange(event) {
     const playPauseBtn = document.getElementById('play-pause-btn');
-
     if (!playPauseBtn) return;
     
     if (event.data === YT.PlayerState.PLAYING) {
@@ -198,7 +171,7 @@ function onPlayerStateChange(event) {
 }
 
 
-// --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
+// --- Carga de Datos Manual y Funciones de Juego (Omitidas para brevedad, sin cambios) ---
 function processManualLyrics() {
     const combinedLyricsInput = document.getElementById('combined-lyrics-input');
     
@@ -206,59 +179,43 @@ function processManualLyrics() {
         alert("Error interno: Campo de texto de carga no encontrado.");
         return;
     }
-
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
-    
     if (!rawText) {
         alert("Por favor, pega la letra completa en el campo de texto.");
         return;
     }
-
     const allLines = rawText.split('\n').filter(line => line.trim() !== '');
-
     if (allLines.length % 2 !== 0) {
         alert("Error: El número total de líneas debe ser PAR (Español, Inglés, Español, Inglés...).");
         return;
     }
-
     const newSongData = [];
-    
     for (let i = 0; i < allLines.length; i += 2) {
         newSongData.push({
             spanish: (allLines[i] || '').trim(), 
             english: (allLines[i + 1] || '').trim() 
         });
     }
-
     if (newSongData.length === 0) {
         alert("No se pudo procesar la letra. Asegúrate de que los campos no estén vacíos.");
         return;
     }
-
-    // Cargar la nueva letra y reiniciar la interfaz
     loadLyrics(newSongData); 
     currentLineIndex = 0; 
     renderFocusedLine(); 
-    
     document.getElementById('active-line-container').style.display = 'flex';
     document.getElementById('game-container').style.display = 'none'; 
-    
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
 
-
-// --- Funciones de Modo Juego ---
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
     const longWords = words.filter(word => word.length > 3);
     if (longWords.length === 0) return { hiddenLine: line.english, missingWord: '' };
-
     const randomIndex = Math.floor(Math.random() * longWords.length);
     const wordToHide = longWords[randomIndex];
-    
     const regex = new RegExp(`\\b${wordToHide}\\b`);
     const hiddenLine = line.english.replace(regex, '___');
-
     return { hiddenLine, missingWord: wordToHide.replace(/[.,!?'"]/, '') }; 
 }
 
@@ -277,10 +234,8 @@ function loadGameLine() {
         if (feedbackElement) feedbackElement.textContent = "¡Felicidades, completaste la canción!";
         return;
     }
-    
     const currentLine = currentSongData[currentGameIndex]; 
     const { hiddenLine, missingWord } = chooseRandomWord(currentLine);
-    
     currentMissingWord = missingWord.toLowerCase();
     
     if (gameLineDiv) gameLineDiv.innerHTML = hiddenLine.replace('___', '<span class="missing-word">___</span>');
@@ -346,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
     const toggleButton = document.getElementById('toggle-mode');
-    const playPauseBtn = document.getElementById('play-pause-btn'); // Nuevo botón
+    const playPauseBtn = document.getElementById('play-pause-btn');
 
     // Inicialización de datos
     loadLyrics();

@@ -12,18 +12,18 @@ let isTranslationMode = false;
 let currentLineIndex = 0; 
 let currentGameIndex = 0;
 let currentMissingWord = '';
+
+// Se inicializa en la API de YouTube
 let youtubePlayerInstance = null; 
 
-
 // ------------------------------------------------------------------------------------------------
-// --- FUNCIONES CENTRALES (BUSCAN ELEMENTOS SOLO CUANDO ES NECESARIO) ---
+// --- FUNCIONES CENTRALES ---
 // ------------------------------------------------------------------------------------------------
 
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray;
     const lyricContainer = document.getElementById('lyric-container');
     
-    // Si el contenedor existe, lo limpia
     if (lyricContainer) lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
@@ -58,15 +58,15 @@ function toggleFullTranslationMode() {
     const activeLineContainer = document.getElementById('active-line-container');
     const lyricContainer = document.getElementById('lyric-container');
 
-    if (activeLineContainer.style.display !== 'none') {
+    if (activeLineContainer && activeLineContainer.style.display !== 'none') {
         // Modo Enfoque -> Traducción Total
         activeLineContainer.style.display = 'none';
-        lyricContainer.style.display = 'block';
+        if (lyricContainer) lyricContainer.style.display = 'block';
         if (toggleButton) toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
-    } else {
+    } else if (activeLineContainer) {
         // Traducción Total -> Modo Enfoque
-        lyricContainer.style.display = 'none';
+        if (lyricContainer) lyricContainer.style.display = 'none';
         activeLineContainer.style.display = 'flex';
         if (toggleButton) toggleButton.textContent = "Mostrar Traducción Total";
         isTranslationMode = false;
@@ -117,40 +117,82 @@ function repeatLine() {
 }
 
 
-// --- Integración de Audio (YouTube) ---
+// --- Integración de Audio (YouTube API) ---
 function getYouTubeVideoId(url) {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\?v=)|youtu\.be\/)([^&]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
 }
 
+// ESTA FUNCIÓN ES LLAMADA POR EL BOTÓN "Cargar Música"
 function loadYouTubeVideo() {
     const urlInput = document.getElementById('youtube-url');
     const playerContainer = document.getElementById('youtube-player');
-
-    const url = urlInput.value;
-    const videoId = getYouTubeVideoId(url);
+    const videoId = getYouTubeVideoId(urlInput.value);
 
     if (videoId && playerContainer) {
-        const iframeHtml = `
-            <iframe 
-                width="100%" 
-                height="315" 
-                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
-                frameborder="0" 
-                allow="autoplay; encrypted-media" 
-                allowfullscreen>
-            </iframe>
-        `;
-        playerContainer.innerHTML = iframeHtml;
+        playerContainer.innerHTML = `<div id="youtube-iframe"></div>`;
         playerContainer.style.marginBottom = '20px'; 
+        
+        // La instancia del reproductor de la API se crea aquí
+        window.YT.ready(function() {
+            youtubePlayerInstance = new YT.Player('youtube-iframe', {
+                height: '315',
+                width: '100%',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 1 
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        });
+
     } else if (playerContainer) {
         alert("Por favor, introduce una URL de YouTube válida.");
         playerContainer.innerHTML = '';
     }
 }
 
-// --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA) ---
+// FUNCIÓN PARA EL BOTÓN PAUSA/PLAY
+function togglePlayPause() {
+    const playPauseBtn = document.getElementById('play-pause-btn');
+
+    if (youtubePlayerInstance && youtubePlayerInstance.getPlayerState) {
+        const state = youtubePlayerInstance.getPlayerState();
+        
+        // 1 (Playing) o 3 (Buffering)
+        if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
+            youtubePlayerInstance.pauseVideo();
+            if (playPauseBtn) playPauseBtn.textContent = '▶️'; // Cambia el ícono a Play
+        } else {
+            youtubePlayerInstance.playVideo();
+            if (playPauseBtn) playPauseBtn.textContent = '⏸️'; // Cambia el ícono a Pause
+        }
+    } else {
+        alert("Por favor, carga primero un video de YouTube.");
+    }
+}
+
+// FUNCIÓN PARA SINCRONIZAR EL ÍCONO DEL BOTÓN PAUSA/PLAY CON EL ESTADO DEL VIDEO
+function onPlayerStateChange(event) {
+    const playPauseBtn = document.getElementById('play-pause-btn');
+
+    if (!playPauseBtn) return;
+    
+    if (event.data === YT.PlayerState.PLAYING) {
+        playPauseBtn.textContent = '⏸️';
+    } else if (event.data === YT.PlayerState.PAUSED) {
+        playPauseBtn.textContent = '▶️';
+    } else if (event.data === YT.PlayerState.ENDED) {
+        playPauseBtn.textContent = '▶️';
+    }
+}
+
+
+// --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
 function processManualLyrics() {
     const combinedLyricsInput = document.getElementById('combined-lyrics-input');
     
@@ -183,7 +225,7 @@ function processManualLyrics() {
     }
 
     if (newSongData.length === 0) {
-        alert("No se pudo procesar la letra.");
+        alert("No se pudo procesar la letra. Asegúrate de que los campos no estén vacíos.");
         return;
     }
 
@@ -192,11 +234,8 @@ function processManualLyrics() {
     currentLineIndex = 0; 
     renderFocusedLine(); 
     
-    const activeLineContainer = document.getElementById('active-line-container');
-    const gameContainer = document.getElementById('game-container');
-
-    if (activeLineContainer) activeLineContainer.style.display = 'flex';
-    if (gameContainer) gameContainer.style.display = 'none'; 
+    document.getElementById('active-line-container').style.display = 'flex';
+    document.getElementById('game-container').style.display = 'none'; 
     
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
@@ -225,7 +264,7 @@ function loadGameLine() {
     const feedbackElement = document.getElementById('feedback');
     
     if (currentGameIndex >= currentSongData.length) { 
-        gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
+        if (gameLineDiv) gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
         if (userInput) userInput.disabled = true;
         if (checkButton) checkButton.disabled = true;
         if (nextGameBtn) nextGameBtn.disabled = true; 
@@ -301,6 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
     const toggleButton = document.getElementById('toggle-mode');
+    const playPauseBtn = document.getElementById('play-pause-btn');
 
     // Inicialización de datos
     loadLyrics();
@@ -310,6 +350,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (nextBtn) nextBtn.addEventListener('click', nextLine);
     if (prevBtn) prevBtn.addEventListener('click', prevLine);
     if (repeatBtn) repeatBtn.addEventListener('click', repeatLine);
+    
+    // EVENTO DE CONTROL DE AUDIO
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
 
     // Eventos de Carga de Contenido
     if (toggleButton) toggleButton.addEventListener('click', toggleFullTranslationMode);

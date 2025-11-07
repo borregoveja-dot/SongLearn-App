@@ -11,167 +11,144 @@ let isTranslationMode = false;
 let currentLineIndex = 0; 
 let currentGameIndex = 0;
 let currentMissingWord = '';
-let youtubePlayerInstance = null; 
 
-// --- Funciones de Interfaz (Omitidas para brevedad, son las mismas) ---
-// ...
+
+// ------------------------------------------------------------------------------------------------
+// --- FUNCIONES CENTRALES ---
+// ------------------------------------------------------------------------------------------------
+
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray;
     const lyricContainer = document.getElementById('lyric-container');
+    
     if (lyricContainer) lyricContainer.innerHTML = ''; 
+    
     currentSongData.forEach((line, index) => {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
+
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
+
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;
+
         lineDiv.appendChild(englishP);
         lineDiv.appendChild(spanishP);
+        
         if (lyricContainer) lyricContainer.appendChild(lineDiv);
+
         lineDiv.addEventListener('click', toggleTranslation);
     });
 }
+
 function toggleTranslation(event) {
     if (isTranslationMode) return; 
     event.currentTarget.classList.toggle('active');
 }
+
 function toggleFullTranslationMode() {
     const toggleButton = document.getElementById('toggle-mode');
     const activeLineContainer = document.getElementById('active-line-container');
     const lyricContainer = document.getElementById('lyric-container');
+
     if (activeLineContainer && activeLineContainer.style.display !== 'none') {
+        // Modo Enfoque -> Traducción Total
         activeLineContainer.style.display = 'none';
         if (lyricContainer) lyricContainer.style.display = 'block';
         if (toggleButton) toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
     } else if (activeLineContainer) {
+        // Traducción Total -> Modo Enfoque
         if (lyricContainer) lyricContainer.style.display = 'none';
         activeLineContainer.style.display = 'flex';
         if (toggleButton) toggleButton.textContent = "Mostrar Traducción Total";
         isTranslationMode = false;
     }
 }
+
+// --- Modo Enfoque y Navegación ---
 function renderFocusedLine() {
     const focusedLineDiv = document.getElementById('focused-line');
+    
     if (currentSongData.length === 0 || !focusedLineDiv) {
         if (focusedLineDiv) focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
         return;
     }
+    
+    // Lógica para manejar el final de la canción
     if (currentLineIndex < 0) currentLineIndex = 0;
+    
     if (currentLineIndex >= currentSongData.length) { 
         currentLineIndex = currentSongData.length;
         focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
         return;
     }
+
     const line = currentSongData[currentLineIndex];
-    focusedLineDiv.innerHTML = `<p class="english-focus">${line.english}</p><p class="translation-focus">${line.spanish}</p>`;
+
+    focusedLineDiv.innerHTML = `
+        <p class="english-focus">${line.english}</p>
+        <p class="translation-focus">${line.spanish}</p>
+    `;
 }
+
 function nextLine() {
     if (currentLineIndex < currentSongData.length) {
         currentLineIndex++;
         renderFocusedLine();
     }
 }
+
 function prevLine() {
     if (currentLineIndex > 0) {
         currentLineIndex--;
         renderFocusedLine();
     }
 }
+
+// Función de Pausa/Play ELIMINADA. El usuario usará los controles del iframe de YouTube.
 function repeatLine() {
-    alert("Funcionalidad de Repetición del Video (API de YouTube) aún no implementada."); 
+    alert("Función de repetición eliminada. Usa el control del video incrustado."); 
 }
 
-// ------------------------------------------------------------------------------------------------
-// --- INTEGRACIÓN DE AUDIO (SOLUCIÓN FINAL DE SINCRONIZACIÓN DE API) ---
-// ------------------------------------------------------------------------------------------------
 
-// *Función Global requerida por la API de YouTube (DEBE ESTAR FUERA DEL DOMContentLoaded)*
-window.onYouTubeIframeAPIReady = function() {
-    console.log("YouTube API Ready.");
-    // No hacemos nada aquí, solo esperamos que el usuario presione Cargar Música
-};
-
-
+// --- Integración de Audio (SIMPLE iframe, estable) ---
 function getYouTubeVideoId(url) {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\?v=)|youtu\.be\/)([^&]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
 }
 
-// FUNCIÓN PARA CARGAR EL REPRODUCTOR
 function loadYouTubeVideo() {
     const urlInput = document.getElementById('youtube-url');
     const playerContainer = document.getElementById('youtube-player');
     const videoId = getYouTubeVideoId(urlInput.value);
 
-    // 1. Verificar la URL y el Contenedor
-    if (!videoId || !playerContainer) {
-        alert("Por favor, introduce una URL de YouTube válida.");
-        if (playerContainer) playerContainer.innerHTML = '';
-        return;
-    }
-    
-    // 2. Esperar la API y Cargar
-    if (typeof YT !== 'undefined' && YT.Player) {
-        playerContainer.innerHTML = `<div id="youtube-iframe"></div>`;
+    if (videoId && playerContainer) {
+        const iframeHtml = `
+            <iframe 
+                width="100%" 
+                height="315" 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                frameborder="0" 
+                allow="autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        `;
+        playerContainer.innerHTML = iframeHtml;
         playerContainer.style.marginBottom = '20px'; 
-        
-        youtubePlayerInstance = new YT.Player('youtube-iframe', {
-            height: '315',
-            width: '100%',
-            videoId: videoId,
-            playerVars: {
-                'autoplay': 1,
-                'controls': 1 
-            },
-            events: {
-                'onStateChange': onPlayerStateChange
-            }
-        });
-    } else {
-        alert("Error de Conexión: La API de YouTube no está disponible. Intente recargar la página.");
-        console.error("YT object not found. YouTube API failed to load.");
-    }
-}
-
-// FUNCIÓN PARA EL BOTÓN PAUSA/PLAY
-function togglePlayPause() {
-    const playPauseBtn = document.getElementById('play-pause-btn');
-
-    if (youtubePlayerInstance && youtubePlayerInstance.getPlayerState) {
-        const state = youtubePlayerInstance.getPlayerState();
-        
-        if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
-            youtubePlayerInstance.pauseVideo();
-            if (playPauseBtn) playPauseBtn.textContent = '▶️';
-        } else {
-            youtubePlayerInstance.playVideo();
-            if (playPauseBtn) playPauseBtn.textContent = '⏸️';
-        }
-    } else {
-        alert("Por favor, carga primero un video de YouTube.");
-    }
-}
-
-// FUNCIÓN PARA SINCRONIZAR EL ÍCONO DEL BOTÓN PAUSA/PLAY CON EL ESTADO DEL VIDEO
-function onPlayerStateChange(event) {
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    if (!playPauseBtn) return;
-    
-    if (event.data === YT.PlayerState.PLAYING) {
-        playPauseBtn.textContent = '⏸️';
-    } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-        playPauseBtn.textContent = '▶️';
+    } else if (playerContainer) {
+        alert("Por favor, introduce una URL de YouTube válida.");
+        playerContainer.innerHTML = '';
     }
 }
 
 
-// --- Carga de Datos Manual y Funciones de Juego (Omitidas para brevedad, sin cambios) ---
+// --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
 function processManualLyrics() {
     const combinedLyricsInput = document.getElementById('combined-lyrics-input');
     
@@ -179,43 +156,62 @@ function processManualLyrics() {
         alert("Error interno: Campo de texto de carga no encontrado.");
         return;
     }
+
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
+    
     if (!rawText) {
         alert("Por favor, pega la letra completa en el campo de texto.");
         return;
     }
+
     const allLines = rawText.split('\n').filter(line => line.trim() !== '');
+
     if (allLines.length % 2 !== 0) {
-        alert("Error: El número total de líneas debe ser PAR (Español, Inglés, Español, Inglés...).");
+        alert("Error: El número total de líneas debe ser PAR.");
         return;
     }
+
     const newSongData = [];
+    
     for (let i = 0; i < allLines.length; i += 2) {
         newSongData.push({
             spanish: (allLines[i] || '').trim(), 
             english: (allLines[i + 1] || '').trim() 
         });
     }
+
     if (newSongData.length === 0) {
         alert("No se pudo procesar la letra. Asegúrate de que los campos no estén vacíos.");
         return;
     }
+
+    // Cargar la nueva letra y reiniciar la interfaz
     loadLyrics(newSongData); 
     currentLineIndex = 0; 
     renderFocusedLine(); 
+    
     document.getElementById('active-line-container').style.display = 'flex';
     document.getElementById('game-container').style.display = 'none'; 
+    
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
+
+
+// --- Funciones de Modo Juego (No modificadas) ---
+let currentGameIndex = 0;
+let currentMissingWord = '';
 
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
     const longWords = words.filter(word => word.length > 3);
     if (longWords.length === 0) return { hiddenLine: line.english, missingWord: '' };
+
     const randomIndex = Math.floor(Math.random() * longWords.length);
     const wordToHide = longWords[randomIndex];
+    
     const regex = new RegExp(`\\b${wordToHide}\\b`);
     const hiddenLine = line.english.replace(regex, '___');
+
     return { hiddenLine, missingWord: wordToHide.replace(/[.,!?'"]/, '') }; 
 }
 
@@ -285,15 +281,12 @@ function startGame() {
 }
 
 
-// ------------------------------------------------------------------------------------------------
-// --- 5. Inicialización y Event Listeners (SOLUCIÓN DEFINITIVA DE INTERACCIÓN Y API) ---
-// ------------------------------------------------------------------------------------------------
+// --- 5. Inicialización y Event Listeners (FINAL Y ESTABLE) ---
 document.addEventListener('DOMContentLoaded', function() {
     
     // VINCULACIÓN DE BOTONES
     const nextBtn = document.getElementById('next-btn'); 
     const prevBtn = document.getElementById('prev-btn');
-    const repeatBtn = document.getElementById('repeat-btn');
     const loadButton = document.getElementById('load-video-btn');
     const loadLyricsButton = document.getElementById('load-lyrics-btn');
     const startGameButton = document.getElementById('start-game-btn'); 
@@ -301,7 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
     const toggleButton = document.getElementById('toggle-mode');
-    const playPauseBtn = document.getElementById('play-pause-btn');
 
     // Inicialización de datos
     loadLyrics();
@@ -310,11 +302,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Eventos de Navegación (Modo Enfoque)
     if (nextBtn) nextBtn.addEventListener('click', nextLine);
     if (prevBtn) prevBtn.addEventListener('click', prevLine);
-    if (repeatBtn) repeatBtn.addEventListener('click', repeatLine);
-    
-    // EVENTO DE CONTROL DE AUDIO
-    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
-    
+    // El botón de repetir ya no existe
+
     // Eventos de Carga de Contenido
     if (toggleButton) toggleButton.addEventListener('click', toggleFullTranslationMode);
     if (loadButton) loadButton.addEventListener('click', loadYouTubeVideo);

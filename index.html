@@ -19,18 +19,23 @@
     </div>
 
     <div id="youtube-player">
-        </div>
+        <div id="youtube-iframe-container"></div>
+    </div>
 
     <div id="manual-input-section">
         <h2>📝 Carga Automática de Letras</h2>
-        <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco. La app hará la separación automáticamente.</p>
+        <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco.</p>
         
-        <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí (Español, Inglés, Español, Inglés...).&#10;Ejemplo:&#10;Cuando miro tus ojos&#10;When I look into your eyes&#10;Puedo ver un amor contenido&#10;I can see a love restrained"></textarea>
+        <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí..."></textarea>
         
         <button id="load-lyrics-btn">Cargar Nueva Canción</button>
     </div>
     <main id="active-line-container">
-        <div id="focused-line">
+        <div id="focus-play-btn-container">
+            <button id="focus-play-btn" title="Reproducir/Pausar">▶️</button>
+        </div>
+        
+        <div id="focused-line" style="cursor: pointer;">
             <p>Carga una canción y su letra para empezar.</p>
         </div>
 
@@ -42,22 +47,20 @@
     
     <div id="game-container">
         <h2>🎯 Modo Juego: Completa la Frase</h2>
-        <div id="game-line" class="lyric-line">
-            </div>
-        
+        <div id="game-line" class="lyric-line"></div>
         <div id="game-input-area">
             <input type="text" id="user-input" placeholder="Escribe la palabra que falta aquí">
             <button id="check-btn">Verificar</button>
             <button id="next-game-btn" disabled>Siguiente</button>
         </div>
-        
         <p id="feedback" class="feedback-text"></p>
     </div>
 
     <div id="controls">
         <button id="start-game-btn">Empezar Juego (Carga actual)</button>
     </div>
-
+    
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
 </body>
 </html>

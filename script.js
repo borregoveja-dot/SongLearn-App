@@ -1,5 +1,4 @@
 // --- 1. Datos de la canción y Variables de Estado Globales ---
-// SOLO VARIABLES DE ESTADO (NO BUSCAN ELEMENTOS HTML)
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
@@ -17,7 +16,7 @@ let currentMissingWord = '';
 let youtubePlayerInstance = null; 
 
 // ------------------------------------------------------------------------------------------------
-// --- FUNCIONES CENTRALES ---
+// --- FUNCIONES CENTRALES Y DE INTERFAZ ---
 // ------------------------------------------------------------------------------------------------
 
 function loadLyrics(dataArray = currentSongData) { 
@@ -117,42 +116,52 @@ function repeatLine() {
 }
 
 
-// --- Integración de Audio (YouTube API) ---
+// ------------------------------------------------------------------------------------------------
+// --- INTEGRACIÓN DE AUDIO (SOLUCIÓN DE SINCRONIZACIÓN DE API) ---
+// ------------------------------------------------------------------------------------------------
+
+// Funnción que la API de YouTube llama cuando su SDK está listo.
+window.onYouTubeIframeAPIReady = function() {
+    // Ya que la API está lista, podemos llamar a la función para cargar el video.
+    // Pero la llamaremos solo cuando el usuario haga clic en 'Cargar Música'.
+    console.log("YouTube API Ready.");
+};
+
 function getYouTubeVideoId(url) {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\?v=)|youtu\.be\/)([^&]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
 }
 
-// ESTA FUNCIÓN ES LLAMADA POR EL BOTÓN "Cargar Música"
+// FUNCIÓN PARA CARGAR EL REPRODUCTOR
 function loadYouTubeVideo() {
     const urlInput = document.getElementById('youtube-url');
     const playerContainer = document.getElementById('youtube-player');
     const videoId = getYouTubeVideoId(urlInput.value);
 
-    if (videoId && playerContainer) {
+    if (videoId && playerContainer && typeof YT !== 'undefined' && YT.Player) {
+        
         playerContainer.innerHTML = `<div id="youtube-iframe"></div>`;
         playerContainer.style.marginBottom = '20px'; 
         
-        // La instancia del reproductor de la API se crea aquí
-        window.YT.ready(function() {
-            youtubePlayerInstance = new YT.Player('youtube-iframe', {
-                height: '315',
-                width: '100%',
-                videoId: videoId,
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 1 
-                },
-                events: {
-                    'onStateChange': onPlayerStateChange
-                }
-            });
+        youtubePlayerInstance = new YT.Player('youtube-iframe', {
+            height: '315',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 1,
+                'controls': 1 
+            },
+            events: {
+                'onStateChange': onPlayerStateChange
+            }
         });
 
-    } else if (playerContainer) {
-        alert("Por favor, introduce una URL de YouTube válida.");
-        playerContainer.innerHTML = '';
+    } else if (!playerContainer) {
+        // Fallo seguro si no se encuentra el contenedor
+        alert("Error interno al encontrar el contenedor del reproductor.");
+    } else {
+        alert("Error: La API de YouTube no está lista o la URL es inválida. Intente recargar la página.");
     }
 }
 
@@ -163,13 +172,12 @@ function togglePlayPause() {
     if (youtubePlayerInstance && youtubePlayerInstance.getPlayerState) {
         const state = youtubePlayerInstance.getPlayerState();
         
-        // 1 (Playing) o 3 (Buffering)
         if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
             youtubePlayerInstance.pauseVideo();
-            if (playPauseBtn) playPauseBtn.textContent = '▶️'; // Cambia el ícono a Play
+            if (playPauseBtn) playPauseBtn.textContent = '▶️';
         } else {
             youtubePlayerInstance.playVideo();
-            if (playPauseBtn) playPauseBtn.textContent = '⏸️'; // Cambia el ícono a Pause
+            if (playPauseBtn) playPauseBtn.textContent = '⏸️';
         }
     } else {
         alert("Por favor, carga primero un video de YouTube.");
@@ -184,9 +192,7 @@ function onPlayerStateChange(event) {
     
     if (event.data === YT.PlayerState.PLAYING) {
         playPauseBtn.textContent = '⏸️';
-    } else if (event.data === YT.PlayerState.PAUSED) {
-        playPauseBtn.textContent = '▶️';
-    } else if (event.data === YT.PlayerState.ENDED) {
+    } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
         playPauseBtn.textContent = '▶️';
     }
 }
@@ -325,11 +331,11 @@ function startGame() {
 
 
 // ------------------------------------------------------------------------------------------------
-// --- 5. Inicialización y Event Listeners (SOLUCIÓN DEFINITIVA DE INTERACCIÓN) ---
+// --- 5. Inicialización y Event Listeners (SOLUCIÓN DEFINITIVA DE INTERACCIÓN Y API) ---
 // ------------------------------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
     
-    // VINCULACIÓN DE BOTONES (AHORA ES SEGURO ENCONTRARLOS)
+    // VINCULACIÓN DE BOTONES
     const nextBtn = document.getElementById('next-btn'); 
     const prevBtn = document.getElementById('prev-btn');
     const repeatBtn = document.getElementById('repeat-btn');
@@ -340,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
     const toggleButton = document.getElementById('toggle-mode');
-    const playPauseBtn = document.getElementById('play-pause-btn');
+    const playPauseBtn = document.getElementById('play-pause-btn'); // Nuevo botón
 
     // Inicialización de datos
     loadLyrics();
@@ -353,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // EVENTO DE CONTROL DE AUDIO
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
-
+    
     // Eventos de Carga de Contenido
     if (toggleButton) toggleButton.addEventListener('click', toggleFullTranslationMode);
     if (loadButton) loadButton.addEventListener('click', loadYouTubeVideo);

@@ -1,4 +1,5 @@
 // --- 1. Datos de la canción y Variables de Estado Globales ---
+// SOLO VARIABLES DE ESTADO (NO BUSCAN ELEMENTOS HTML)
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
@@ -15,14 +16,14 @@ let youtubePlayerInstance = null;
 
 
 // ------------------------------------------------------------------------------------------------
-// --- FUNCIONES CENTRALES (Solo usan IDs pasados o document.getElementById) ---
+// --- FUNCIONES CENTRALES (BUSCAN ELEMENTOS SOLO CUANDO ES NECESARIO) ---
 // ------------------------------------------------------------------------------------------------
 
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray;
     const lyricContainer = document.getElementById('lyric-container');
     
-    // Si el contenedor existe (para el modo traducción total), lo limpia
+    // Si el contenedor existe, lo limpia
     if (lyricContainer) lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
@@ -61,13 +62,13 @@ function toggleFullTranslationMode() {
         // Modo Enfoque -> Traducción Total
         activeLineContainer.style.display = 'none';
         lyricContainer.style.display = 'block';
-        toggleButton.textContent = "Ocultar Traducción Total";
+        if (toggleButton) toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
     } else {
         // Traducción Total -> Modo Enfoque
         lyricContainer.style.display = 'none';
         activeLineContainer.style.display = 'flex';
-        toggleButton.textContent = "Mostrar Traducción Total";
+        if (toggleButton) toggleButton.textContent = "Mostrar Traducción Total";
         isTranslationMode = false;
     }
 }
@@ -76,12 +77,11 @@ function toggleFullTranslationMode() {
 function renderFocusedLine() {
     const focusedLineDiv = document.getElementById('focused-line');
     
-    if (currentSongData.length === 0) {
-        focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
+    if (currentSongData.length === 0 || !focusedLineDiv) {
+        if (focusedLineDiv) focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
         return;
     }
     
-    // Lógica para manejar el final de la canción
     if (currentLineIndex < 0) currentLineIndex = 0;
     
     if (currentLineIndex >= currentSongData.length) { 
@@ -131,7 +131,7 @@ function loadYouTubeVideo() {
     const url = urlInput.value;
     const videoId = getYouTubeVideoId(url);
 
-    if (videoId) {
+    if (videoId && playerContainer) {
         const iframeHtml = `
             <iframe 
                 width="100%" 
@@ -144,7 +144,7 @@ function loadYouTubeVideo() {
         `;
         playerContainer.innerHTML = iframeHtml;
         playerContainer.style.marginBottom = '20px'; 
-    } else {
+    } else if (playerContainer) {
         alert("Por favor, introduce una URL de YouTube válida.");
         playerContainer.innerHTML = '';
     }
@@ -153,6 +153,12 @@ function loadYouTubeVideo() {
 // --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA) ---
 function processManualLyrics() {
     const combinedLyricsInput = document.getElementById('combined-lyrics-input');
+    
+    if (!combinedLyricsInput) {
+        alert("Error interno: Campo de texto de carga no encontrado.");
+        return;
+    }
+
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
     
     if (!rawText) {
@@ -177,7 +183,7 @@ function processManualLyrics() {
     }
 
     if (newSongData.length === 0) {
-        alert("No se pudo procesar la letra. Asegúrate de que los campos no estén vacíos.");
+        alert("No se pudo procesar la letra.");
         return;
     }
 
@@ -186,8 +192,11 @@ function processManualLyrics() {
     currentLineIndex = 0; 
     renderFocusedLine(); 
     
-    document.getElementById('active-line-container').style.display = 'flex';
-    document.getElementById('game-container').style.display = 'none'; 
+    const activeLineContainer = document.getElementById('active-line-container');
+    const gameContainer = document.getElementById('game-container');
+
+    if (activeLineContainer) activeLineContainer.style.display = 'flex';
+    if (gameContainer) gameContainer.style.display = 'none'; 
     
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
@@ -217,10 +226,10 @@ function loadGameLine() {
     
     if (currentGameIndex >= currentSongData.length) { 
         gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
-        userInput.disabled = true;
-        checkButton.disabled = true;
-        nextGameBtn.disabled = true; 
-        feedbackElement.textContent = "¡Felicidades, completaste la canción!";
+        if (userInput) userInput.disabled = true;
+        if (checkButton) checkButton.disabled = true;
+        if (nextGameBtn) nextGameBtn.disabled = true; 
+        if (feedbackElement) feedbackElement.textContent = "¡Felicidades, completaste la canción!";
         return;
     }
     
@@ -229,12 +238,12 @@ function loadGameLine() {
     
     currentMissingWord = missingWord.toLowerCase();
     
-    gameLineDiv.innerHTML = hiddenLine.replace('___', '<span class="missing-word">___</span>');
-    userInput.value = '';
-    userInput.disabled = false;
-    checkButton.disabled = false;
-    nextGameBtn.disabled = true; 
-    feedbackElement.textContent = '';
+    if (gameLineDiv) gameLineDiv.innerHTML = hiddenLine.replace('___', '<span class="missing-word">___</span>');
+    if (userInput) userInput.value = '';
+    if (userInput) userInput.disabled = false;
+    if (checkButton) checkButton.disabled = false;
+    if (nextGameBtn) nextGameBtn.disabled = true; 
+    if (feedbackElement) feedbackElement.textContent = '';
 }
 
 function checkAnswer() {
@@ -247,17 +256,17 @@ function checkAnswer() {
     const userAnswer = userInput.value.trim().toLowerCase();
     
     if (userAnswer === currentMissingWord) {
-        feedbackElement.textContent = "¡Correcto! ✅";
-        feedbackElement.classList.remove('incorrect');
-        feedbackElement.classList.add('correct');
-        nextGameBtn.disabled = false; 
-        userInput.disabled = true;
+        if (feedbackElement) feedbackElement.textContent = "¡Correcto! ✅";
+        if (feedbackElement) feedbackElement.classList.remove('incorrect');
+        if (feedbackElement) feedbackElement.classList.add('correct');
+        if (nextGameBtn) nextGameBtn.disabled = false; 
+        if (userInput) userInput.disabled = true;
         
-        gameLineDiv.innerHTML = currentSongData[currentGameIndex].english; 
+        if (gameLineDiv) gameLineDiv.innerHTML = currentSongData[currentGameIndex].english; 
     } else {
-        feedbackElement.textContent = "Incorrecto. ❌ Inténtalo de nuevo.";
-        feedbackElement.classList.remove('correct');
-        feedbackElement.classList.add('incorrect');
+        if (feedbackElement) feedbackElement.textContent = "Incorrecto. ❌ Inténtalo de nuevo.";
+        if (feedbackElement) feedbackElement.classList.remove('correct');
+        if (feedbackElement) feedbackElement.classList.add('incorrect');
     }
 }
 
@@ -281,7 +290,7 @@ function startGame() {
 // ------------------------------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
     
-    // VINCULACIÓN DE BOTONES: TODOS LOS getElementById DEBEN ESTAR AQUÍ
+    // VINCULACIÓN DE BOTONES (AHORA ES SEGURO ENCONTRARLOS)
     const nextBtn = document.getElementById('next-btn'); 
     const prevBtn = document.getElementById('prev-btn');
     const repeatBtn = document.getElementById('repeat-btn');

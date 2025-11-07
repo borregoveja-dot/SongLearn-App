@@ -1,4 +1,4 @@
-// --- Declaración de Variables Globales (Solo las necesarias) ---
+// --- 1. Datos de la canción y Variables de Estado Globales ---
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
@@ -7,17 +7,23 @@ let currentSongData = [
     { english: "And I knew I had to run away.", spanish: "Y supe que tenía que huir." }
 ];
 
-const lyricContainer = document.getElementById('lyric-container');
-const toggleButton = document.getElementById('toggle-mode');
-
 let isTranslationMode = false;
 let currentLineIndex = 0; 
+let currentGameIndex = 0;
+let currentMissingWord = '';
 let youtubePlayerInstance = null; 
 
-// --- Funciones de Traducción Interactiva y Carga ---
+
+// ------------------------------------------------------------------------------------------------
+// --- FUNCIONES CENTRALES (Solo usan IDs pasados o document.getElementById) ---
+// ------------------------------------------------------------------------------------------------
+
 function loadLyrics(dataArray = currentSongData) { 
-    currentSongData = dataArray; 
-    lyricContainer.innerHTML = ''; 
+    currentSongData = dataArray;
+    const lyricContainer = document.getElementById('lyric-container');
+    
+    // Si el contenedor existe (para el modo traducción total), lo limpia
+    if (lyricContainer) lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
         const lineDiv = document.createElement('div');
@@ -34,7 +40,8 @@ function loadLyrics(dataArray = currentSongData) {
 
         lineDiv.appendChild(englishP);
         lineDiv.appendChild(spanishP);
-        lyricContainer.appendChild(lineDiv);
+        
+        if (lyricContainer) lyricContainer.appendChild(lineDiv);
 
         lineDiv.addEventListener('click', toggleTranslation);
     });
@@ -46,8 +53,9 @@ function toggleTranslation(event) {
 }
 
 function toggleFullTranslationMode() {
-    // Lógica para cambiar entre modo Enfoque y modo Traducción Total
+    const toggleButton = document.getElementById('toggle-mode');
     const activeLineContainer = document.getElementById('active-line-container');
+    const lyricContainer = document.getElementById('lyric-container');
 
     if (activeLineContainer.style.display !== 'none') {
         // Modo Enfoque -> Traducción Total
@@ -64,7 +72,7 @@ function toggleFullTranslationMode() {
     }
 }
 
-// --- Funciones de Modo Enfoque y Navegación ---
+// --- Modo Enfoque y Navegación ---
 function renderFocusedLine() {
     const focusedLineDiv = document.getElementById('focused-line');
     
@@ -75,6 +83,7 @@ function renderFocusedLine() {
     
     // Lógica para manejar el final de la canción
     if (currentLineIndex < 0) currentLineIndex = 0;
+    
     if (currentLineIndex >= currentSongData.length) { 
         currentLineIndex = currentSongData.length;
         focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
@@ -104,11 +113,11 @@ function prevLine() {
 }
 
 function repeatLine() {
-    alert("Funcionalidad de Repetición del Video (API de YouTube) aún no implementada, pero la interfaz está lista."); 
+    alert("Funcionalidad de Repetición del Video (API de YouTube) aún no implementada."); 
 }
 
 
-// --- Funciones de Integración de Audio (YouTube) ---
+// --- Integración de Audio (YouTube) ---
 function getYouTubeVideoId(url) {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\?v=)|youtu\.be\/)([^&]+)/;
     const match = url.match(regex);
@@ -141,7 +150,7 @@ function loadYouTubeVideo() {
     }
 }
 
-// --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
+// --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA) ---
 function processManualLyrics() {
     const combinedLyricsInput = document.getElementById('combined-lyrics-input');
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
@@ -154,7 +163,7 @@ function processManualLyrics() {
     const allLines = rawText.split('\n').filter(line => line.trim() !== '');
 
     if (allLines.length % 2 !== 0) {
-        alert("Error: El número total de líneas debe ser PAR (Español, Inglés, Español, Inglés...). Por favor, verifica que no falte la última traducción o letra.");
+        alert("Error: El número total de líneas debe ser PAR (Español, Inglés, Español, Inglés...).");
         return;
     }
 
@@ -172,7 +181,7 @@ function processManualLyrics() {
         return;
     }
 
-    // 4. ¡Cargar la nueva letra y reiniciar la interfaz!
+    // Cargar la nueva letra y reiniciar la interfaz
     loadLyrics(newSongData); 
     currentLineIndex = 0; 
     renderFocusedLine(); 
@@ -185,15 +194,12 @@ function processManualLyrics() {
 
 
 // --- Funciones de Modo Juego ---
-let currentGameIndex = 0;
-let currentMissingWord = '';
-
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
     const longWords = words.filter(word => word.length > 3);
     if (longWords.length === 0) return { hiddenLine: line.english, missingWord: '' };
 
-    const randomIndex = Math.floor(L.random() * longWords.length);
+    const randomIndex = Math.floor(Math.random() * longWords.length);
     const wordToHide = longWords[randomIndex];
     
     const regex = new RegExp(`\\b${wordToHide}\\b`);
@@ -270,12 +276,12 @@ function startGame() {
 }
 
 
-// --- 5. Inicialización y Event Listeners (FINAL Y CORREGIDO) ---
-
-// Espera a que TODO el HTML se haya cargado antes de vincular los eventos
+// ------------------------------------------------------------------------------------------------
+// --- 5. Inicialización y Event Listeners (SOLUCIÓN DEFINITIVA DE INTERACCIÓN) ---
+// ------------------------------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
     
-    // VINCULACIÓN DE BOTONES (DECLARADOS AQUÍ para evitar el error de ámbito)
+    // VINCULACIÓN DE BOTONES: TODOS LOS getElementById DEBEN ESTAR AQUÍ
     const nextBtn = document.getElementById('next-btn'); 
     const prevBtn = document.getElementById('prev-btn');
     const repeatBtn = document.getElementById('repeat-btn');
@@ -285,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkButton = document.getElementById('check-btn');
     const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
+    const toggleButton = document.getElementById('toggle-mode');
 
     // Inicialización de datos
     loadLyrics();
@@ -318,7 +325,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    // Inicializa el estado oculto del juego
-    document.getElementById('game-container').style.display = 'none';
 });

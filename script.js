@@ -16,15 +16,14 @@ const focusedLineDiv = document.getElementById('focused-line');
 const repeatBtn = document.getElementById('repeat-btn');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
-const nextGameBtn = document.getElementById('next-game-btn'); // Botón de avance de juego
+const nextGameBtn = document.getElementById('next-game-btn'); 
 
-let currentLineIndex = 0; // Índice de la frase activa
+let currentLineIndex = 0; 
 let youtubePlayerInstance = null; 
 
 // --- Funciones de Traducción Interactiva y Carga ---
 function loadLyrics(dataArray = currentSongData) { 
-    currentSongData = dataArray; // Actualiza los datos para toda la aplicación
-    // ESTA SECCIÓN CARGA LA VISTA DE TRADUCCIÓN TOTAL (NO LA DE ENFOQUE)
+    currentSongData = dataArray; 
     lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
@@ -54,16 +53,14 @@ function toggleTranslation(event) {
 }
 
 function toggleFullTranslationMode() {
-    // CAMBIA ENTRE MODO ENFOQUE (DEFAULT) y MODO TRADUCCIÓN TOTAL
-    
+    // Si la traducción total está visible, la ocultamos y mostramos el enfoque.
     if (document.getElementById('active-line-container').style.display !== 'none') {
-        // Estamos en Modo Enfoque, cambiamos a Traducción Total
         document.getElementById('active-line-container').style.display = 'none';
         lyricContainer.style.display = 'block';
         toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
     } else {
-        // Estamos en Traducción Total, volvemos a Enfoque
+        // Si la traducción total está oculta, la mostramos.
         lyricContainer.style.display = 'none';
         document.getElementById('active-line-container').style.display = 'flex';
         toggleButton.textContent = "Mostrar Traducción Total";
@@ -81,7 +78,11 @@ function renderFocusedLine() {
     
     // Aseguramos que el índice sea válido
     if (currentLineIndex < 0) currentLineIndex = 0;
-    if (currentLineIndex >= currentSongData.length) currentLineIndex = currentSongData.length - 1;
+    if (currentLineIndex >= currentSongData.length) { // Si llega al final, muestra mensaje de terminado
+        currentLineIndex = currentSongData.length;
+        focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
+        return;
+    }
 
     const line = currentSongData[currentLineIndex];
 
@@ -92,12 +93,9 @@ function renderFocusedLine() {
 }
 
 function nextLine() {
-    if (currentLineIndex < currentSongData.length - 1) {
+    if (currentLineIndex < currentSongData.length) {
         currentLineIndex++;
         renderFocusedLine();
-    } else if (currentLineIndex === currentSongData.length - 1) {
-        currentLineIndex++;
-        focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
     }
 }
 
@@ -183,9 +181,9 @@ function processManualLyrics() {
     // 4. ¡Cargar la nueva letra y reiniciar la interfaz!
     loadLyrics(newSongData); 
     currentLineIndex = 0; 
-    renderFocusedLine(); // Muestra la primera línea en el modo enfoque
+    renderFocusedLine(); 
     
-    // Configura la interfaz de vuelta al modo Enfoque
+    // Asegura que el modo enfoque esté visible
     document.getElementById('active-line-container').style.display = 'flex';
     document.getElementById('game-container').style.display = 'none'; 
     
@@ -202,8 +200,6 @@ const gameLineDiv = document.getElementById('game-line');
 const userInput = document.getElementById('user-input');
 const checkButton = document.getElementById('check-btn');
 const startGameButton = document.getElementById('start-game-btn');
-
-gameContainer.style.display = 'none'; 
 
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
@@ -268,39 +264,61 @@ function nextGameLine() {
 function startGame() {
     document.getElementById('active-line-container').style.display = 'none';
     gameContainer.style.display = 'block'; 
-    startGameButton.style.display = 'none';
+    document.getElementById('controls').style.display = 'none'; // Oculta el botón de iniciar juego
     
     currentGameIndex = 0;
     loadGameLine();
 }
 
-// --- 5. Inicialización y Event Listeners ---
-loadLyrics();
-renderFocusedLine(); 
 
-// Eventos de Navegación (Modo Enfoque)
-nextBtn.addEventListener('click', nextLine);
-prevBtn.addEventListener('click', prevLine);
-repeatBtn.addEventListener('click', repeatLine);
+// --- 5. Inicialización y Event Listeners (FINAL Y CORREGIDO) ---
 
-// Eventos de Carga de Contenido
-toggleButton.addEventListener('click', toggleFullTranslationMode);
-loadButton.addEventListener('click', loadYouTubeVideo);
-loadLyricsButton.addEventListener('click', processManualLyrics); 
+// Espera a que TODO el HTML se haya cargado antes de vincular los eventos
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // VINCULACIÓN DE BOTONES
+    const nextBtn = document.getElementById('next-btn'); 
+    const prevBtn = document.getElementById('prev-btn');
+    const repeatBtn = document.getElementById('repeat-btn');
+    const loadButton = document.getElementById('load-video-btn');
+    const loadLyricsButton = document.getElementById('load-lyrics-btn');
+    const startGameButton = document.getElementById('start-game-btn'); 
+    const checkButton = document.getElementById('check-btn');
+    const userInput = document.getElementById('user-input');
 
-// Eventos del Modo Juego
-startGameButton.addEventListener('click', startGame);
-checkButton.addEventListener('click', checkAnswer);
-if (nextGameBtn) nextGameBtn.addEventListener('click', nextGameLine);
+    // Inicialización de datos
+    loadLyrics();
+    renderFocusedLine(); 
 
-// Permite usar la tecla Enter para verificar
-userInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault(); 
-        if (!nextGameBtn.disabled) {
-            nextGameLine();
-        } else if (!userInput.disabled) {
-            checkAnswer();
-        }
+    // Eventos de Navegación (Modo Enfoque)
+    if (nextBtn) nextBtn.addEventListener('click', nextLine);
+    if (prevBtn) prevBtn.addEventListener('click', prevLine);
+    if (repeatBtn) repeatBtn.addEventListener('click', repeatLine);
+
+    // Eventos de Carga de Contenido
+    if (toggleButton) toggleButton.addEventListener('click', toggleFullTranslationMode);
+    if (loadButton) loadButton.addEventListener('click', loadYouTubeVideo);
+    if (loadLyricsButton) loadLyricsButton.addEventListener('click', processManualLyrics); 
+
+    // Eventos del Modo Juego
+    if (startGameButton) startGameButton.addEventListener('click', startGame);
+    if (checkButton) checkButton.addEventListener('click', checkAnswer);
+    if (nextGameBtn) nextGameBtn.addEventListener('click', nextGameLine);
+
+    // Evento de Tecla Enter
+    if (userInput) {
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                if (nextGameBtn && !nextGameBtn.disabled) {
+                    nextGameLine();
+                } else if (checkButton && !checkButton.disabled) {
+                    checkAnswer();
+                }
+            }
+        });
     }
+
+    // Inicializa el estado oculto del juego
+    document.getElementById('game-container').style.display = 'none';
 });

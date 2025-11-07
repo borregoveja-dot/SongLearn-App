@@ -13,18 +13,15 @@
     </header>
 
     <div id="audio-input-section">
-        <h2>🎵 Enlace de YouTube</h2>
-        <input type="text" id="youtube-url" placeholder="Pega aquí el enlace de YouTube de la canción">
-        <button id="load-video-btn">Cargar Música</button>
+        <h2>🎵 Carga el Archivo de Audio</h2>
+        <p class="small-note">Sube un archivo de audio (MP3, WAV) o pega un enlace directo a un archivo de audio para el control de Play/Pause.</p>
+        
+        <input type="file" id="audio-file-input" accept="audio/*" style="width: 100%; margin-bottom: 10px;">
+        <audio id="local-audio-player" controls style="width: 100%; margin-top: 10px;"></audio>
     </div>
-
-    <div id="youtube-player">
-        <div id="youtube-iframe-container"></div>
-    </div>
-
     <div id="manual-input-section">
         <h2>📝 Carga Automática de Letras</h2>
-        <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco.</p>
+        <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco. La app hará la separación automáticamente.</p>
         
         <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí..."></textarea>
         
@@ -35,7 +32,7 @@
             <button id="focus-play-btn" title="Reproducir/Pausar">▶️</button>
         </div>
         
-        <div id="focused-line" style="cursor: pointer;">
+        <div id="focused-line"> 
             <p>Carga una canción y su letra para empezar.</p>
         </div>
 
@@ -59,8 +56,7 @@
     <div id="controls">
         <button id="start-game-btn">Empezar Juego (Carga actual)</button>
     </div>
-    
-    <script src="https://www.youtube.com/iframe_api"></script>
+
     <script src="script.js"></script>
 </body>
 </html>

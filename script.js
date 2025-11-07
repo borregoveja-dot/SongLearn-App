@@ -11,10 +11,9 @@ let isTranslationMode = false;
 let currentLineIndex = 0; 
 let currentGameIndex = 0;
 let currentMissingWord = '';
-let youtubePlayerInstance = null; // Mantenida, pero no usada activamente
 
 // ------------------------------------------------------------------------------------------------
-// --- FUNCIONES CENTRALES ---
+// --- FUNCIONES DE INTERFAZ Y NAVEGACIÓN ---
 // ------------------------------------------------------------------------------------------------
 
 function loadLyrics(dataArray = currentSongData) { 
@@ -27,20 +26,15 @@ function loadLyrics(dataArray = currentSongData) {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
-
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
-
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;
-
         lineDiv.appendChild(englishP);
         lineDiv.appendChild(spanishP);
-        
         if (lyricContainer) lyricContainer.appendChild(lineDiv);
-
         lineDiv.addEventListener('click', toggleTranslation);
     });
 }
@@ -56,13 +50,11 @@ function toggleFullTranslationMode() {
     const lyricContainer = document.getElementById('lyric-container');
 
     if (activeLineContainer && activeLineContainer.style.display !== 'none') {
-        // Modo Enfoque -> Traducción Total
         activeLineContainer.style.display = 'none';
         if (lyricContainer) lyricContainer.style.display = 'block';
         if (toggleButton) toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
     } else if (activeLineContainer) {
-        // Traducción Total -> Modo Enfoque
         if (lyricContainer) lyricContainer.style.display = 'none';
         activeLineContainer.style.display = 'flex';
         if (toggleButton) toggleButton.textContent = "Mostrar Traducción Total";
@@ -121,6 +113,7 @@ function getYouTubeVideoId(url) {
     return match ? match[1] : null;
 }
 
+// CORRECCIÓN FINAL DE LA FUNCIÓN DE CARGA DE MÚSICA
 function loadYouTubeVideo() {
     const urlInput = document.getElementById('youtube-url');
     const playerContainer = document.getElementById('youtube-player');
@@ -140,6 +133,7 @@ function loadYouTubeVideo() {
         playerContainer.innerHTML = iframeHtml;
         playerContainer.style.marginBottom = '20px'; 
     } else if (playerContainer) {
+        // CORRECCIÓN: El error de conexión ha sido eliminado, solo alerta URL inválida
         alert("Por favor, introduce una URL de YouTube válida.");
         playerContainer.innerHTML = '';
     }
@@ -195,7 +189,7 @@ function processManualLyrics() {
 }
 
 
-// --- Funciones de Modo Juego ---
+// --- Funciones de Modo Juego (No modificadas) ---
 let currentGameIndex = 0;
 let currentMissingWord = '';
 

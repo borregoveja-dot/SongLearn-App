@@ -1,3 +1,12 @@
+¡Absolutamente! Tienes razón. Para implementar el nuevo Modo Enfoque y la navegación manual, el archivo script.js necesita una actualización completa y corregida.
+
+Aquí tienes el código completo y final para script.js, que incluye la lógica de Carga Automática, Modo Enfoque, y las funciones de Navegación Manual.
+
+🧠 Archivo: script.js (Lógica Final para Modo Enfoque)
+
+Por favor, abre el archivo script.js en GitHub, borra todo el contenido y pega este código completo en su lugar. Luego, haz "Commit changes" (confirmar cambios).
+JavaScript
+
 // --- 1. Datos de la canción (Inicialmente simulados) ---
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
@@ -11,22 +20,30 @@ const lyricContainer = document.getElementById('lyric-container');
 const toggleButton = document.getElementById('toggle-mode');
 let isTranslationMode = false;
 
-// --- Funciones de Traducción Interactiva ---
+// --- Variables de Modo Enfoque y Navegación ---
+const focusedLineDiv = document.getElementById('focused-line');
+const repeatBtn = document.getElementById('repeat-btn');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+
+let currentLineIndex = 0; // Índice de la frase activa
+let youtubePlayerInstance = null; // Para la futura API de YouTube
+
+// --- Funciones de Traducción Interactiva y Carga ---
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray; // Actualiza los datos para toda la aplicación
     lyricContainer.innerHTML = ''; 
     
+    // Esta sección solo carga el DOM, no se usa en Modo Enfoque, pero se mantiene por si se cambia el modo.
     currentSongData.forEach((line, index) => {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
         lineDiv.dataset.index = index; 
 
-        // Crea el texto en inglés
         const englishP = document.createElement('p');
         englishP.classList.add('english-text');
         englishP.textContent = line.english;
 
-        // Crea la traducción en español
         const spanishP = document.createElement('p');
         spanishP.classList.add('spanish-translation');
         spanishP.textContent = line.spanish;
@@ -58,6 +75,49 @@ function toggleFullTranslationMode() {
         }
     });
 }
+
+// --- Funciones de Modo Enfoque y Navegación ---
+
+function renderFocusedLine() {
+    // Si no hay datos, muestra un mensaje de bienvenida
+    if (currentSongData.length === 0 || currentLineIndex >= currentSongData.length) {
+        focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
+        return;
+    }
+    
+    // Aseguramos que el índice sea válido
+    if (currentLineIndex < 0) currentLineIndex = 0;
+
+    const line = currentSongData[currentLineIndex];
+
+    focusedLineDiv.innerHTML = `
+        <p class="english-focus">${line.english}</p>
+        <p class="translation-focus">${line.spanish}</p>
+    `;
+}
+
+function nextLine() {
+    if (currentLineIndex < currentSongData.length - 1) {
+        currentLineIndex++;
+        renderFocusedLine();
+    } else if (currentLineIndex === currentSongData.length - 1) {
+        currentLineIndex++;
+        focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
+    }
+}
+
+function prevLine() {
+    if (currentLineIndex > 0) {
+        currentLineIndex--;
+        renderFocusedLine();
+    }
+}
+
+function repeatLine() {
+    // Lógica para la futura API de YouTube (requiere el SDK de YouTube)
+    alert("Para implementar la repetición precisa de la frase, necesitamos integrar el SDK de YouTube. ¡Ese es el siguiente paso de integración avanzado!"); 
+}
+
 
 // --- Funciones de Integración de Audio (YouTube) ---
 const urlInput = document.getElementById('youtube-url');
@@ -133,11 +193,12 @@ function processManualLyrics() {
 
     // 4. ¡Cargar la nueva letra y reiniciar la interfaz!
     loadLyrics(newSongData); 
-    currentGameIndex = 0; 
+    currentLineIndex = 0; // REINICIA el índice de la línea activa
+    renderFocusedLine(); // Muestra la primera línea
     
     // Configura la interfaz de vuelta al modo Traducción
     gameContainer.style.display = 'none'; 
-    lyricContainer.style.display = 'block';
+    lyricContainer.style.display = 'block'; // Ocultar si solo se usa enfoque
     startGameButton.style.display = 'block'; 
     toggleButton.style.display = 'block';
     
@@ -145,7 +206,7 @@ function processManualLyrics() {
 }
 
 
-// --- Funciones de Modo Juego ---
+// --- Funciones de Modo Juego (No modificadas, usan currentSongData) ---
 let currentGameIndex = 0;
 let currentMissingWord = '';
 
@@ -153,7 +214,8 @@ const gameContainer = document.getElementById('game-container');
 const gameLineDiv = document.getElementById('game-line');
 const userInput = document.getElementById('user-input');
 const checkButton = document.getElementById('check-btn');
-const nextButton = document.getElementById('next-btn');
+// El botón next-game-btn ahora tiene el ID next-game-btn en index.html
+const nextGameBtn = document.getElementById('next-game-btn'); 
 const feedbackElement = document.getElementById('feedback');
 const startGameButton = document.getElementById('start-game-btn');
 
@@ -161,14 +223,12 @@ gameContainer.style.display = 'none';
 
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
-    // Intentamos ocultar palabras de más de 3 letras para que sea interesante
     const longWords = words.filter(word => word.length > 3);
     if (longWords.length === 0) return { hiddenLine: line.english, missingWord: '' };
 
     const randomIndex = Math.floor(Math.random() * longWords.length);
     const wordToHide = longWords[randomIndex];
     
-    // Reemplaza la palabra entera por el hueco
     const regex = new RegExp(`\\b${wordToHide}\\b`);
     const hiddenLine = line.english.replace(regex, '___');
 
@@ -180,7 +240,7 @@ function loadGameLine() {
         gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
         userInput.disabled = true;
         checkButton.disabled = true;
-        nextButton.disabled = true;
+        nextGameBtn.disabled = true; 
         feedbackElement.textContent = "¡Felicidades, completaste la canción!";
         return;
     }
@@ -194,7 +254,7 @@ function loadGameLine() {
     userInput.value = '';
     userInput.disabled = false;
     checkButton.disabled = false;
-    nextButton.disabled = true;
+    nextGameBtn.disabled = true; 
     feedbackElement.textContent = '';
 }
 
@@ -205,7 +265,7 @@ function checkAnswer() {
         feedbackElement.textContent = "¡Correcto! ✅";
         feedbackElement.classList.remove('incorrect');
         feedbackElement.classList.add('correct');
-        nextButton.disabled = false; 
+        nextGameBtn.disabled = false; 
         userInput.disabled = true;
         
         gameLineDiv.innerHTML = currentSongData[currentGameIndex].english; 
@@ -216,7 +276,7 @@ function checkAnswer() {
     }
 }
 
-function nextLine() {
+function nextGameLine() { // Función de avance de juego separada de la navegación
     currentGameIndex++;
     loadGameLine();
 }
@@ -231,25 +291,32 @@ function startGame() {
     loadGameLine();
 }
 
+
 // --- 5. Inicialización y Event Listeners ---
 loadLyrics();
+renderFocusedLine(); // Muestra la primera línea de enfoque al cargar
+
+// Eventos de Navegación (Modo Enfoque)
+nextBtn.addEventListener('click', nextLine);
+prevBtn.addEventListener('click', prevLine);
+repeatBtn.addEventListener('click', repeatLine);
+
+// Eventos de Carga de Contenido
 toggleButton.addEventListener('click', toggleFullTranslationMode);
 loadButton.addEventListener('click', loadYouTubeVideo);
-
-// ACTIVACIÓN DEL BOTÓN DE CARGA MANUAL:
 loadLyricsButton.addEventListener('click', processManualLyrics); 
 
-// Eventos del juego
+// Eventos del Modo Juego
 startGameButton.addEventListener('click', startGame);
 checkButton.addEventListener('click', checkAnswer);
-nextButton.addEventListener('click', nextLine);
+if (nextGameBtn) nextGameBtn.addEventListener('click', nextGameLine); // Usa la nueva función de juego
 
 // Permite usar la tecla Enter para verificar
 userInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         e.preventDefault(); 
-        if (!nextButton.disabled) {
-            nextLine();
+        if (!nextGameBtn.disabled) {
+            nextGameLine();
         } else if (!userInput.disabled) {
             checkAnswer();
         }

@@ -24,7 +24,7 @@ let youtubePlayerInstance = null;
 // --- Funciones de Traducción Interactiva y Carga ---
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray; // Actualiza los datos para toda la aplicación
-    // Esta sección solo carga el DOM de la traducción total (no la de enfoque)
+    // ESTA SECCIÓN CARGA LA VISTA DE TRADUCCIÓN TOTAL (NO LA DE ENFOQUE)
     lyricContainer.innerHTML = ''; 
     
     currentSongData.forEach((line, index) => {
@@ -54,32 +54,34 @@ function toggleTranslation(event) {
 }
 
 function toggleFullTranslationMode() {
-    isTranslationMode = !isTranslationMode;
-    toggleButton.textContent = isTranslationMode ? "Ocultar Traducción Total" : "Mostrar Traducción Total";
+    // CAMBIA ENTRE MODO ENFOQUE (DEFAULT) y MODO TRADUCCIÓN TOTAL
     
-    // El modo enfoque no usa lyricContainer, pero esta lógica se mantiene
-    document.querySelectorAll('.lyric-line').forEach(line => {
-        if (isTranslationMode) {
-            line.classList.add('active');
-            line.style.cursor = 'default';
-        } else {
-            line.classList.remove('active');
-            line.style.cursor = 'pointer';
-        }
-    });
+    if (document.getElementById('active-line-container').style.display !== 'none') {
+        // Estamos en Modo Enfoque, cambiamos a Traducción Total
+        document.getElementById('active-line-container').style.display = 'none';
+        lyricContainer.style.display = 'block';
+        toggleButton.textContent = "Ocultar Traducción Total";
+        isTranslationMode = true;
+    } else {
+        // Estamos en Traducción Total, volvemos a Enfoque
+        lyricContainer.style.display = 'none';
+        document.getElementById('active-line-container').style.display = 'flex';
+        toggleButton.textContent = "Mostrar Traducción Total";
+        isTranslationMode = false;
+    }
 }
 
 // --- Funciones de Modo Enfoque y Navegación ---
 
 function renderFocusedLine() {
-    // Si no hay datos, muestra un mensaje de bienvenida
-    if (currentSongData.length === 0 || currentLineIndex >= currentSongData.length) {
+    if (currentSongData.length === 0) {
         focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
         return;
     }
     
     // Aseguramos que el índice sea válido
     if (currentLineIndex < 0) currentLineIndex = 0;
+    if (currentLineIndex >= currentSongData.length) currentLineIndex = currentSongData.length - 1;
 
     const line = currentSongData[currentLineIndex];
 
@@ -107,7 +109,7 @@ function prevLine() {
 }
 
 function repeatLine() {
-    alert("Para implementar la repetición precisa de la frase, necesitamos integrar el SDK de YouTube. (Próximo paso)"); 
+    alert("Funcionalidad de Repetición del Video (API de YouTube) aún no implementada, pero la interfaz está lista."); 
 }
 
 
@@ -145,12 +147,11 @@ function loadYouTubeVideo() {
     }
 }
 
-// --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL Y ROBUSTA) ---
+// --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
 const combinedLyricsInput = document.getElementById('combined-lyrics-input');
 const loadLyricsButton = document.getElementById('load-lyrics-btn');
 
 function processManualLyrics() {
-    // 1. Obtiene el texto y lo limpia. Maneja saltos de línea de forma robusta.
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
     
     if (!rawText) {
@@ -158,7 +159,6 @@ function processManualLyrics() {
         return;
     }
 
-    // 2. Divide el texto por el salto de línea '\n' y elimina líneas vacías
     const allLines = rawText.split('\n').filter(line => line.trim() !== '');
 
     if (allLines.length % 2 !== 0) {
@@ -168,7 +168,6 @@ function processManualLyrics() {
 
     const newSongData = [];
     
-    // 3. Itera y empareja las líneas: [i] es Español, [i+1] es Inglés
     for (let i = 0; i < allLines.length; i += 2) {
         newSongData.push({
             spanish: (allLines[i] || '').trim(), 
@@ -182,13 +181,13 @@ function processManualLyrics() {
     }
 
     // 4. ¡Cargar la nueva letra y reiniciar la interfaz!
-    loadLyrics(newSongData); // Actualiza los datos internos y la vista de traducción total
-    currentLineIndex = 0; // REINICIA el índice de la línea activa
+    loadLyrics(newSongData); 
+    currentLineIndex = 0; 
     renderFocusedLine(); // Muestra la primera línea en el modo enfoque
     
-    // Configura la interfaz de vuelta al modo Traducción
-    document.getElementById('active-line-container').style.display = 'flex'; // Asegura que el enfoque esté visible
-    document.getElementById('game-container').style.display = 'none'; // Asegura que el juego esté oculto
+    // Configura la interfaz de vuelta al modo Enfoque
+    document.getElementById('active-line-container').style.display = 'flex';
+    document.getElementById('game-container').style.display = 'none'; 
     
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
@@ -277,7 +276,7 @@ function startGame() {
 
 // --- 5. Inicialización y Event Listeners ---
 loadLyrics();
-renderFocusedLine(); // Muestra la primera línea de enfoque al cargar
+renderFocusedLine(); 
 
 // Eventos de Navegación (Modo Enfoque)
 nextBtn.addEventListener('click', nextLine);

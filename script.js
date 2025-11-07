@@ -1,4 +1,4 @@
-// --- 1. Datos de la canción (Inicialmente simulados) ---
+// --- Declaración de Variables Globales (Solo las necesarias) ---
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
     { english: "When the sky turned black and blue", spanish: "Cuando el cielo se puso negro y azul" },
@@ -9,15 +9,8 @@ let currentSongData = [
 
 const lyricContainer = document.getElementById('lyric-container');
 const toggleButton = document.getElementById('toggle-mode');
+
 let isTranslationMode = false;
-
-// --- Variables de Modo Enfoque y Navegación ---
-const focusedLineDiv = document.getElementById('focused-line');
-const repeatBtn = document.getElementById('repeat-btn');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const nextGameBtn = document.getElementById('next-game-btn'); 
-
 let currentLineIndex = 0; 
 let youtubePlayerInstance = null; 
 
@@ -53,32 +46,36 @@ function toggleTranslation(event) {
 }
 
 function toggleFullTranslationMode() {
-    // Si la traducción total está visible, la ocultamos y mostramos el enfoque.
-    if (document.getElementById('active-line-container').style.display !== 'none') {
-        document.getElementById('active-line-container').style.display = 'none';
+    // Lógica para cambiar entre modo Enfoque y modo Traducción Total
+    const activeLineContainer = document.getElementById('active-line-container');
+
+    if (activeLineContainer.style.display !== 'none') {
+        // Modo Enfoque -> Traducción Total
+        activeLineContainer.style.display = 'none';
         lyricContainer.style.display = 'block';
         toggleButton.textContent = "Ocultar Traducción Total";
         isTranslationMode = true;
     } else {
-        // Si la traducción total está oculta, la mostramos.
+        // Traducción Total -> Modo Enfoque
         lyricContainer.style.display = 'none';
-        document.getElementById('active-line-container').style.display = 'flex';
+        activeLineContainer.style.display = 'flex';
         toggleButton.textContent = "Mostrar Traducción Total";
         isTranslationMode = false;
     }
 }
 
 // --- Funciones de Modo Enfoque y Navegación ---
-
 function renderFocusedLine() {
+    const focusedLineDiv = document.getElementById('focused-line');
+    
     if (currentSongData.length === 0) {
         focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
         return;
     }
     
-    // Aseguramos que el índice sea válido
+    // Lógica para manejar el final de la canción
     if (currentLineIndex < 0) currentLineIndex = 0;
-    if (currentLineIndex >= currentSongData.length) { // Si llega al final, muestra mensaje de terminado
+    if (currentLineIndex >= currentSongData.length) { 
         currentLineIndex = currentSongData.length;
         focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
         return;
@@ -112,10 +109,6 @@ function repeatLine() {
 
 
 // --- Funciones de Integración de Audio (YouTube) ---
-const urlInput = document.getElementById('youtube-url');
-const loadButton = document.getElementById('load-video-btn');
-const playerContainer = document.getElementById('youtube-player');
-
 function getYouTubeVideoId(url) {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\?v=)|youtu\.be\/)([^&]+)/;
     const match = url.match(regex);
@@ -123,6 +116,9 @@ function getYouTubeVideoId(url) {
 }
 
 function loadYouTubeVideo() {
+    const urlInput = document.getElementById('youtube-url');
+    const playerContainer = document.getElementById('youtube-player');
+
     const url = urlInput.value;
     const videoId = getYouTubeVideoId(url);
 
@@ -146,10 +142,8 @@ function loadYouTubeVideo() {
 }
 
 // --- Funciones de Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
-const combinedLyricsInput = document.getElementById('combined-lyrics-input');
-const loadLyricsButton = document.getElementById('load-lyrics-btn');
-
 function processManualLyrics() {
+    const combinedLyricsInput = document.getElementById('combined-lyrics-input');
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
     
     if (!rawText) {
@@ -183,7 +177,6 @@ function processManualLyrics() {
     currentLineIndex = 0; 
     renderFocusedLine(); 
     
-    // Asegura que el modo enfoque esté visible
     document.getElementById('active-line-container').style.display = 'flex';
     document.getElementById('game-container').style.display = 'none'; 
     
@@ -195,18 +188,12 @@ function processManualLyrics() {
 let currentGameIndex = 0;
 let currentMissingWord = '';
 
-const gameContainer = document.getElementById('game-container');
-const gameLineDiv = document.getElementById('game-line');
-const userInput = document.getElementById('user-input');
-const checkButton = document.getElementById('check-btn');
-const startGameButton = document.getElementById('start-game-btn');
-
 function chooseRandomWord(line) {
     const words = line.english.split(' ');
     const longWords = words.filter(word => word.length > 3);
     if (longWords.length === 0) return { hiddenLine: line.english, missingWord: '' };
 
-    const randomIndex = Math.floor(Math.random() * longWords.length);
+    const randomIndex = Math.floor(L.random() * longWords.length);
     const wordToHide = longWords[randomIndex];
     
     const regex = new RegExp(`\\b${wordToHide}\\b`);
@@ -216,6 +203,12 @@ function chooseRandomWord(line) {
 }
 
 function loadGameLine() {
+    const gameLineDiv = document.getElementById('game-line');
+    const userInput = document.getElementById('user-input');
+    const checkButton = document.getElementById('check-btn');
+    const nextGameBtn = document.getElementById('next-game-btn');
+    const feedbackElement = document.getElementById('feedback');
+    
     if (currentGameIndex >= currentSongData.length) { 
         gameLineDiv.innerHTML = "¡Juego Terminado! 🏆";
         userInput.disabled = true;
@@ -239,6 +232,12 @@ function loadGameLine() {
 }
 
 function checkAnswer() {
+    const checkButton = document.getElementById('check-btn');
+    const nextGameBtn = document.getElementById('next-game-btn');
+    const feedbackElement = document.getElementById('feedback');
+    const userInput = document.getElementById('user-input');
+    const gameLineDiv = document.getElementById('game-line');
+
     const userAnswer = userInput.value.trim().toLowerCase();
     
     if (userAnswer === currentMissingWord) {
@@ -263,8 +262,8 @@ function nextGameLine() {
 
 function startGame() {
     document.getElementById('active-line-container').style.display = 'none';
-    gameContainer.style.display = 'block'; 
-    document.getElementById('controls').style.display = 'none'; // Oculta el botón de iniciar juego
+    document.getElementById('game-container').style.display = 'block'; 
+    document.getElementById('controls').style.display = 'none'; 
     
     currentGameIndex = 0;
     loadGameLine();
@@ -276,7 +275,7 @@ function startGame() {
 // Espera a que TODO el HTML se haya cargado antes de vincular los eventos
 document.addEventListener('DOMContentLoaded', function() {
     
-    // VINCULACIÓN DE BOTONES
+    // VINCULACIÓN DE BOTONES (DECLARADOS AQUÍ para evitar el error de ámbito)
     const nextBtn = document.getElementById('next-btn'); 
     const prevBtn = document.getElementById('prev-btn');
     const repeatBtn = document.getElementById('repeat-btn');
@@ -284,6 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadLyricsButton = document.getElementById('load-lyrics-btn');
     const startGameButton = document.getElementById('start-game-btn'); 
     const checkButton = document.getElementById('check-btn');
+    const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
 
     // Inicialización de datos

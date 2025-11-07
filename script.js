@@ -11,7 +11,7 @@ let isTranslationMode = false;
 let currentLineIndex = 0; 
 let currentGameIndex = 0;
 let currentMissingWord = '';
-
+let youtubePlayerInstance = null; // Mantenida, pero no usada activamente
 
 // ------------------------------------------------------------------------------------------------
 // --- FUNCIONES CENTRALES ---
@@ -79,7 +79,6 @@ function renderFocusedLine() {
         return;
     }
     
-    // Lógica para manejar el final de la canción
     if (currentLineIndex < 0) currentLineIndex = 0;
     
     if (currentLineIndex >= currentSongData.length) { 
@@ -110,7 +109,6 @@ function prevLine() {
     }
 }
 
-// Función de Pausa/Play ELIMINADA. El usuario usará los controles del iframe de YouTube.
 function repeatLine() {
     alert("Función de repetición eliminada. Usa el control del video incrustado."); 
 }
@@ -197,7 +195,7 @@ function processManualLyrics() {
 }
 
 
-// --- Funciones de Modo Juego (No modificadas) ---
+// --- Funciones de Modo Juego ---
 let currentGameIndex = 0;
 let currentMissingWord = '';
 
@@ -302,8 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Eventos de Navegación (Modo Enfoque)
     if (nextBtn) nextBtn.addEventListener('click', nextLine);
     if (prevBtn) prevBtn.addEventListener('click', prevLine);
-    // El botón de repetir ya no existe
-
+    
     // Eventos de Carga de Contenido
     if (toggleButton) toggleButton.addEventListener('click', toggleFullTranslationMode);
     if (loadButton) loadButton.addEventListener('click', loadYouTubeVideo);

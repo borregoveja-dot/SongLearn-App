@@ -77,6 +77,7 @@ h1 {
     border: 1px solid #ffc107;
     margin: 15px;
     border-radius: 8px;
+    display: block !important; /* CORRECCIÓN: Visible por defecto */
 }
 
 #manual-input-section h2 {
@@ -120,7 +121,7 @@ h1 {
     padding: 30px 20px;
     text-align: center;
     min-height: 250px; 
-    display: flex;
+    display: flex; /* CORRECCIÓN: Visible por defecto */
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -139,7 +140,7 @@ h1 {
 
 #focused-line p {
     margin: 10px 0;
-    font-size: 1.8em; /* Letra más grande para enfoque */
+    font-size: 1.8em;
     line-height: 1.4;
     font-weight: 600;
 }
@@ -150,7 +151,7 @@ h1 {
     color: #5d5d81; 
     margin-top: 10px;
     font-weight: normal;
-    display: block; /* Asegura el salto de línea */
+    display: block; 
 }
 
 /* Controles de Playback/Navegación */
@@ -175,25 +176,9 @@ h1 {
     background-color: #0056b3;
 }
 
-/* Estilos de las líneas (solo se usan en el modo traducción total) */
-.english-text, .spanish-translation {
-    margin: 0; 
-    padding: 0;
-    display: block; 
-}
-
-.spanish-translation {
-    display: none; 
-    font-style: italic;
-    color: #888;
-    margin-top: 5px;
-    border-top: 1px dashed #eee;
-    padding-top: 5px;
-}
-
-/* Estilo para mostrar la traducción */
-.lyric-line.active .spanish-translation {
-    display: block;
+/* Ocultar el contenedor de traducción total, solo mostramos el enfoque */
+#lyric-container {
+    display: none !important; 
 }
 
 /* --- ESTILOS DEL MODO JUEGO --- */
@@ -203,6 +188,7 @@ h1 {
     border-radius: 10px;
     margin: 20px 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none !important; /* Ocultar juego al inicio */
 }
 
 #game-line {

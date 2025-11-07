@@ -1,12 +1,3 @@
-¡Absolutamente! Tienes razón. Para implementar el nuevo Modo Enfoque y la navegación manual, el archivo script.js necesita una actualización completa y corregida.
-
-Aquí tienes el código completo y final para script.js, que incluye la lógica de Carga Automática, Modo Enfoque, y las funciones de Navegación Manual.
-
-🧠 Archivo: script.js (Lógica Final para Modo Enfoque)
-
-Por favor, abre el archivo script.js en GitHub, borra todo el contenido y pega este código completo en su lugar. Luego, haz "Commit changes" (confirmar cambios).
-JavaScript
-
 // --- 1. Datos de la canción (Inicialmente simulados) ---
 let currentSongData = [
     { english: "I was standing in the street", spanish: "Yo estaba parado en la calle" },
@@ -25,16 +16,17 @@ const focusedLineDiv = document.getElementById('focused-line');
 const repeatBtn = document.getElementById('repeat-btn');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
+const nextGameBtn = document.getElementById('next-game-btn'); // Botón de avance de juego
 
 let currentLineIndex = 0; // Índice de la frase activa
-let youtubePlayerInstance = null; // Para la futura API de YouTube
+let youtubePlayerInstance = null; 
 
 // --- Funciones de Traducción Interactiva y Carga ---
 function loadLyrics(dataArray = currentSongData) { 
     currentSongData = dataArray; // Actualiza los datos para toda la aplicación
+    // Esta sección solo carga el DOM de la traducción total (no la de enfoque)
     lyricContainer.innerHTML = ''; 
     
-    // Esta sección solo carga el DOM, no se usa en Modo Enfoque, pero se mantiene por si se cambia el modo.
     currentSongData.forEach((line, index) => {
         const lineDiv = document.createElement('div');
         lineDiv.classList.add('lyric-line');
@@ -65,6 +57,7 @@ function toggleFullTranslationMode() {
     isTranslationMode = !isTranslationMode;
     toggleButton.textContent = isTranslationMode ? "Ocultar Traducción Total" : "Mostrar Traducción Total";
     
+    // El modo enfoque no usa lyricContainer, pero esta lógica se mantiene
     document.querySelectorAll('.lyric-line').forEach(line => {
         if (isTranslationMode) {
             line.classList.add('active');
@@ -114,8 +107,7 @@ function prevLine() {
 }
 
 function repeatLine() {
-    // Lógica para la futura API de YouTube (requiere el SDK de YouTube)
-    alert("Para implementar la repetición precisa de la frase, necesitamos integrar el SDK de YouTube. ¡Ese es el siguiente paso de integración avanzado!"); 
+    alert("Para implementar la repetición precisa de la frase, necesitamos integrar el SDK de YouTube. (Próximo paso)"); 
 }
 
 
@@ -158,7 +150,7 @@ const combinedLyricsInput = document.getElementById('combined-lyrics-input');
 const loadLyricsButton = document.getElementById('load-lyrics-btn');
 
 function processManualLyrics() {
-    // 1. Obtiene el texto y lo limpia. Usa un regex para manejar diferentes tipos de saltos de línea.
+    // 1. Obtiene el texto y lo limpia. Maneja saltos de línea de forma robusta.
     const rawText = combinedLyricsInput.value.trim().replace(/\r\n|\r/g, '\n');
     
     if (!rawText) {
@@ -179,9 +171,7 @@ function processManualLyrics() {
     // 3. Itera y empareja las líneas: [i] es Español, [i+1] es Inglés
     for (let i = 0; i < allLines.length; i += 2) {
         newSongData.push({
-            // El primer elemento (posición impar) es Español
             spanish: (allLines[i] || '').trim(), 
-            // El segundo elemento (posición par) es Inglés
             english: (allLines[i + 1] || '').trim() 
         });
     }
@@ -192,21 +182,19 @@ function processManualLyrics() {
     }
 
     // 4. ¡Cargar la nueva letra y reiniciar la interfaz!
-    loadLyrics(newSongData); 
+    loadLyrics(newSongData); // Actualiza los datos internos y la vista de traducción total
     currentLineIndex = 0; // REINICIA el índice de la línea activa
-    renderFocusedLine(); // Muestra la primera línea
+    renderFocusedLine(); // Muestra la primera línea en el modo enfoque
     
     // Configura la interfaz de vuelta al modo Traducción
-    gameContainer.style.display = 'none'; 
-    lyricContainer.style.display = 'block'; // Ocultar si solo se usa enfoque
-    startGameButton.style.display = 'block'; 
-    toggleButton.style.display = 'block';
+    document.getElementById('active-line-container').style.display = 'flex'; // Asegura que el enfoque esté visible
+    document.getElementById('game-container').style.display = 'none'; // Asegura que el juego esté oculto
     
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
 
 
-// --- Funciones de Modo Juego (No modificadas, usan currentSongData) ---
+// --- Funciones de Modo Juego ---
 let currentGameIndex = 0;
 let currentMissingWord = '';
 
@@ -214,9 +202,6 @@ const gameContainer = document.getElementById('game-container');
 const gameLineDiv = document.getElementById('game-line');
 const userInput = document.getElementById('user-input');
 const checkButton = document.getElementById('check-btn');
-// El botón next-game-btn ahora tiene el ID next-game-btn en index.html
-const nextGameBtn = document.getElementById('next-game-btn'); 
-const feedbackElement = document.getElementById('feedback');
 const startGameButton = document.getElementById('start-game-btn');
 
 gameContainer.style.display = 'none'; 
@@ -276,21 +261,19 @@ function checkAnswer() {
     }
 }
 
-function nextGameLine() { // Función de avance de juego separada de la navegación
+function nextGameLine() { 
     currentGameIndex++;
     loadGameLine();
 }
 
 function startGame() {
-    lyricContainer.style.display = 'none'; 
-    toggleButton.style.display = 'none'; 
+    document.getElementById('active-line-container').style.display = 'none';
     gameContainer.style.display = 'block'; 
     startGameButton.style.display = 'none';
     
     currentGameIndex = 0;
     loadGameLine();
 }
-
 
 // --- 5. Inicialización y Event Listeners ---
 loadLyrics();
@@ -309,7 +292,7 @@ loadLyricsButton.addEventListener('click', processManualLyrics);
 // Eventos del Modo Juego
 startGameButton.addEventListener('click', startGame);
 checkButton.addEventListener('click', checkAnswer);
-if (nextGameBtn) nextGameBtn.addEventListener('click', nextGameLine); // Usa la nueva función de juego
+if (nextGameBtn) nextGameBtn.addEventListener('click', nextGameLine);
 
 // Permite usar la tecla Enter para verificar
 userInput.addEventListener('keypress', function(e) {

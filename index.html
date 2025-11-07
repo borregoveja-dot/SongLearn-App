@@ -1,32 +1,64 @@
-<main id="active-line-container">
-    <div id="focused-line">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SongLearn 🎶</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>SongLearn</h1>
+        <button id="toggle-mode">Ocultar Traducción Total</button>
+    </header>
+
+    <div id="audio-input-section">
+        <h2>🎵 Enlace de YouTube</h2>
+        <input type="text" id="youtube-url" placeholder="Pega aquí el enlace de YouTube de la canción">
+        <button id="load-video-btn">Cargar Música</button>
+    </div>
+
+    <div id="youtube-player">
         </div>
 
-    <div id="playback-controls">
-        <button id="repeat-btn" title="Repetir frase">🔁</button>
-        <button id="prev-btn" title="Frase anterior">⏪</button>
-        <button id="next-btn" title="Frase siguiente">⏩</button>
+    <div id="manual-input-section">
+        <h2>📝 Carga Automática de Letras</h2>
+        <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco. La app hará la separación automáticamente.</p>
+        
+        <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí (Español, Inglés, Español, Inglés...).&#10;Ejemplo:&#10;Cuando miro tus ojos&#10;When I look into your eyes&#10;Puedo ver un amor contenido&#10;I can see a love restrained"></textarea>
+        
+        <button id="load-lyrics-btn">Cargar Nueva Canción</button>
     </div>
-</main>
-    
-<div id="game-container">
-    <h2>🎯 Modo Juego: Completa la Frase</h2>
-    <div id="game-line" class="lyric-line">
+    <main id="active-line-container">
+        <div id="focused-line">
+            <p>Carga una canción y su letra para empezar.</p>
         </div>
+
+        <div id="playback-controls">
+            <button id="repeat-btn" title="Repetir frase">🔁</button>
+            <button id="prev-btn" title="Frase anterior">⏪</button>
+            <button id="next-btn" title="Frase siguiente">⏩</button>
+        </div>
+    </main>
     
-    <div id="game-input-area">
-        <input type="text" id="user-input" placeholder="Escribe la palabra que falta aquí">
-        <button id="check-btn">Verificar</button>
-        <button id="next-game-btn" disabled>Siguiente</button>
+    <div id="game-container">
+        <h2>🎯 Modo Juego: Completa la Frase</h2>
+        <div id="game-line" class="lyric-line">
+            </div>
+        
+        <div id="game-input-area">
+            <input type="text" id="user-input" placeholder="Escribe la palabra que falta aquí">
+            <button id="check-btn">Verificar</button>
+            <button id="next-game-btn" disabled>Siguiente</button>
+        </div>
+        
+        <p id="feedback" class="feedback-text"></p>
     </div>
-    
-    <p id="feedback" class="feedback-text"></p>
-</div>
 
-<div id="controls">
-    <button id="start-game-btn">Empezar Juego (Carga actual)</button>
-</div>
+    <div id="controls">
+        <button id="start-game-btn">Empezar Juego (Carga actual)</button>
+    </div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

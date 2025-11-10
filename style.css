@@ -1,13 +1,123 @@
-/* ... (Todo el código anterior de style.css se mantiene) ... */
+/* Estilos Base y Reseteo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
 
-/* --- NUEVOS ESTILOS PARA EL BOTÓN DE PAUSA EN EL ENFOQUE --- */
+header {
+    background-color: #5d5d81; 
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Estilos para el Botón de Traducción */
+#toggle-mode {
+    background-color: #ff9f1c; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#toggle-mode:hover {
+    background-color: #e08b1a;
+}
+
+/* Sección de Audio */
+#audio-input-section {
+    padding: 15px;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #ddd;
+}
+
+#audio-file-input {
+    width: 100%;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+
+/* --- ESTILOS PARA LA CARGA MANUAL --- */
+#manual-input-section {
+    padding: 15px;
+    background-color: #fff3cd; 
+    border: 1px solid #ffc107;
+    margin: 15px;
+    border-radius: 8px;
+    display: block !important; 
+}
+
+#manual-input-section h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+#combined-lyrics-input {
+    width: 100%;
+    min-height: 150px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-family: monospace;
+    white-space: pre-wrap; 
+}
+
+#load-lyrics-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff9f1c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.small-note {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* --- ESTILOS PARA EL MODO ENFOQUE --- */
+
+#active-line-container {
+    padding: 30px 20px;
+    text-align: center;
+    min-height: 250px; 
+    display: flex !important; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 #focus-play-btn-container {
     margin-bottom: 10px;
-    height: 50px; /* Mantener espacio fijo */
+    height: 50px; 
 }
 
 #focus-play-btn {
-    background-color: #dc3545; /* Rojo */
+    background-color: #dc3545; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -21,6 +131,136 @@
     background-color: #c82333;
 }
 
-/* El resto de estilos para #active-line-container, #focused-line, etc. se mantienen */
+#focused-line {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+}
 
-/* --- FIN DE ESTILOS DE PAUSA --- */
+#focused-line p {
+    margin: 10px 0;
+    font-size: 1.8em;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+#focused-line .translation-focus {
+    font-size: 1.2em;
+    font-style: italic;
+    color: #5d5d81; 
+    margin-top: 10px;
+    font-weight: normal;
+    display: block; 
+}
+
+/* Controles de Playback/Navegación */
+#playback-controls {
+    display: flex;
+    gap: 15px;
+}
+
+#playback-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%; 
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#playback-controls button:hover {
+    background-color: #0056b3;
+}
+
+/* Ocultar el contenedor de traducción total, solo mostramos el enfoque */
+#lyric-container {
+    display: none !important; 
+}
+
+/* --- ESTILOS DEL MODO JUEGO --- */
+#game-container {
+    padding: 15px;
+    background-color: #e6f7ff; 
+    border-radius: 10px;
+    margin: 20px 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none !important; 
+}
+
+#game-line {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff; 
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.missing-word {
+    color: #dc3545; 
+    text-decoration: underline;
+}
+
+#game-input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+#check-btn, #next-game-btn, #start-game-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#check-btn {
+    background-color: #28a745; 
+    color: white;
+}
+
+#next-game-btn {
+    background-color: #ffc107; 
+    color: #333;
+}
+
+#next-game-btn:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #6c757d;
+}
+
+#start-game-btn {
+    background-color: #007bff; 
+    color: white;
+    margin: 10px 15px;
+    width: calc(100% - 30px); 
+    display: block;
+}
+
+/* Retroalimentación */
+.feedback-text.correct {
+    color: #28a745; 
+    font-weight: bold;
+}
+
+.feedback-text.incorrect {
+    color: #dc3545; 
+    font-weight: bold;
+}

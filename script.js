@@ -13,8 +13,9 @@ let currentGameIndex = 0;
 let currentMissingWord = '';
 let audioPlayer = null; // Instancia para el reproductor de audio HTML5
 
+
 // ------------------------------------------------------------------------------------------------
-// --- FUNCIONES CENTRALES Y DE INTERFAZ (RESTO DE CÓDIGO PERMANECE IGUAL) ---
+// --- FUNCIONES CENTRALES ---
 // ------------------------------------------------------------------------------------------------
 
 function loadLyrics(dataArray = currentSongData) { 
@@ -39,10 +40,12 @@ function loadLyrics(dataArray = currentSongData) {
         lineDiv.addEventListener('click', toggleTranslation);
     });
 }
+
 function toggleTranslation(event) {
     if (isTranslationMode) return; 
     event.currentTarget.classList.toggle('active');
 }
+
 function toggleFullTranslationMode() {
     const toggleButton = document.getElementById('toggle-mode');
     const activeLineContainer = document.getElementById('active-line-container');
@@ -60,46 +63,47 @@ function toggleFullTranslationMode() {
         isTranslationMode = false;
     }
 }
+
+// --- Modo Enfoque y Navegación ---
 function renderFocusedLine() {
     const focusedLineDiv = document.getElementById('focused-line');
+    
     if (currentSongData.length === 0 || !focusedLineDiv) {
         if (focusedLineDiv) focusedLineDiv.innerHTML = "<p>Carga una canción y su letra para empezar.</p>";
         return;
     }
+    
     if (currentLineIndex < 0) currentLineIndex = 0;
+    
     if (currentLineIndex >= currentSongData.length) { 
         currentLineIndex = currentSongData.length;
         focusedLineDiv.innerHTML = `<p style="font-size: 1.5em; color: #28a745;">¡Canción terminada! Puedes empezar el Juego.</p>`;
         return;
     }
+
     const line = currentSongData[currentLineIndex];
-    focusedLineDiv.innerHTML = `<p class="english-focus">${line.english}</p><p class="translation-focus">${line.spanish}</p>`;
+
+    focusedLineDiv.innerHTML = `
+        <p class="english-focus">${line.english}</p>
+        <p class="translation-focus">${line.spanish}</p>
+    `;
 }
+
 function nextLine() {
     if (currentLineIndex < currentSongData.length) {
         currentLineIndex++;
         renderFocusedLine();
     }
 }
+
 function prevLine() {
     if (currentLineIndex > 0) {
         currentLineIndex--;
         renderFocusedLine();
     }
 }
-function repeatLine() {
-    if (audioPlayer) {
-        // Reinicia la reproducción al inicio (Audio HTML5 no tiene control de frase)
-        audioPlayer.currentTime = 0; 
-        audioPlayer.play();
-    } else {
-        alert("Carga un archivo de audio primero.");
-    }
-}
 
-// ------------------------------------------------------------------------------------------------
 // --- CONTROL DE AUDIO ESTABLE (HTML5) ---
-// ------------------------------------------------------------------------------------------------
 
 // FUNCIÓN DE CONTROL DE PAUSA/PLAY (ESTABLE)
 function togglePlayPause() {
@@ -127,6 +131,7 @@ function handleFileInput(event) {
         if (audioPlayer) audioPlayer.src = url;
     }
 }
+
 
 // --- Carga de Datos Manual (VERSIÓN AUTOMÁTICA FINAL) ---
 function processManualLyrics() {
@@ -175,6 +180,7 @@ function processManualLyrics() {
     
     alert(`¡Canción de ${newSongData.length} frases cargada con éxito!`);
 }
+
 
 // --- Funciones de Modo Juego (resto sin cambios) ---
 function chooseRandomWord(line) {
@@ -263,10 +269,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const userInput = document.getElementById('user-input');
     const toggleButton = document.getElementById('toggle-mode');
     const focusedLineDiv = document.getElementById('focused-line');
-    const focusPlayBtn = document.getElementById('focus-play-btn'); // NUEVO BOTÓN
-    const audioFileInput = document.getElementById('audio-file-input'); // NUEVA ENTRADA DE ARCHIVO
-    audioPlayer = document.getElementById('local-audio-player'); // OBTENER INSTANCIA DEL REPRODUCTOR
-    
+    const focusPlayBtn = document.getElementById('focus-play-btn'); // Botón de Play/Pause
+    const audioFileInput = document.getElementById('audio-file-input'); // Entrada de archivo
+    audioPlayer = document.getElementById('local-audio-player'); // Reproductor de audio
+
     // Inicialización de datos
     loadLyrics();
     renderFocusedLine(); 
@@ -281,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Eventos de Carga de Contenido
     if (toggleButton) toggleButton.addEventListener('click', toggleFullTranslationMode);
     if (loadLyricsButton) loadLyricsButton.addEventListener('click', processManualLyrics); 
-    if (audioFileInput) audioFileInput.addEventListener('change', handleFileInput); // VINCULAR LA ENTRADA DE ARCHIVO
+    if (audioFileInput) audioFileInput.addEventListener('change', handleFileInput); // VINCULAR SUBIDA DE ARCHIVO
 
     // Eventos del Modo Juego
     if (startGameButton) startGameButton.addEventListener('click', startGame);

@@ -13,17 +13,17 @@
     </header>
 
     <div id="audio-input-section">
-        <h2>🎵 Carga el Archivo de Audio</h2>
-        <p class="small-note">Sube un archivo de audio (MP3, WAV) o pega un enlace directo a un archivo de audio para el control de Play/Pause.</p>
+        <h2>🎵 Control de Audio</h2>
+        <p class="small-note">Sube un archivo de audio (MP3, WAV) para el control de Play/Pause.</p>
         
-        <input type="file" id="audio-file-input" accept="audio/*" style="width: 100%; margin-bottom: 10px;">
-        <audio id="local-audio-player" controls style="width: 100%; margin-top: 10px;"></audio>
+        <input type="file" id="audio-file-input" accept="audio/*">
+        <audio id="local-audio-player" style="display: none;"></audio> 
     </div>
     <div id="manual-input-section">
         <h2>📝 Carga Automática de Letras</h2>
         <p class="small-note">Pega el texto de tu fuente aquí. El formato debe ser **Español, Inglés, Español, Inglés**, sin dejar líneas en blanco. La app hará la separación automáticamente.</p>
         
-        <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí..."></textarea>
+        <textarea id="combined-lyrics-input" placeholder="Pega el texto aquí (Español, Inglés, Español, Inglés...).&#10;Ejemplo:&#10;Cuando miro tus ojos&#10;When I look into your eyes&#10;Puedo ver un amor contenido&#10;I can see a love restrained"></textarea>
         
         <button id="load-lyrics-btn">Cargar Nueva Canción</button>
     </div>
@@ -45,11 +45,13 @@
     <div id="game-container">
         <h2>🎯 Modo Juego: Completa la Frase</h2>
         <div id="game-line" class="lyric-line"></div>
+        
         <div id="game-input-area">
             <input type="text" id="user-input" placeholder="Escribe la palabra que falta aquí">
             <button id="check-btn">Verificar</button>
             <button id="next-game-btn" disabled>Siguiente</button>
         </div>
+        
         <p id="feedback" class="feedback-text"></p>
     </div>
 

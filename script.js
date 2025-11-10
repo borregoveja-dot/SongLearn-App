@@ -96,12 +96,31 @@ function nextLine() {
     }
 }
 
-function prevLine() {
+// NUEVA FUNCIÓN DE REBOBINADO Y REPETICIÓN DE FRASE (VINCULADA AL BOTÓN ⏪)
+function rewindAndRepeat() {
+    const rewindSeconds = 5; // Cantidad de segundos a retroceder
+
+    // 1. Retrocede la frase de la letra
     if (currentLineIndex > 0) {
         currentLineIndex--;
         renderFocusedLine();
     }
+    
+    // 2. Rebobina el audio (solo si hay un reproductor cargado)
+    if (audioPlayer && audioPlayer.readyState >= 2) {
+        audioPlayer.currentTime -= rewindSeconds;
+        
+        // Asegura que el audio se reproduzca si estaba pausado
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            const focusPlayBtn = document.getElementById('focus-play-btn');
+            if (focusPlayBtn) focusPlayBtn.textContent = '⏸️'; 
+        }
+    } else {
+        alert("El audio ha regresado. Sube un archivo de audio para escuchar la repetición.");
+    }
 }
+
 
 // --- CONTROL DE AUDIO ESTABLE (HTML5) ---
 
@@ -129,6 +148,10 @@ function handleFileInput(event) {
     if (file) {
         const url = URL.createObjectURL(file);
         if (audioPlayer) audioPlayer.src = url;
+        
+        // Reiniciar el botón a Play al cargar un nuevo archivo
+        const focusPlayBtn = document.getElementById('focus-play-btn');
+        if (focusPlayBtn) focusPlayBtn.textContent = '▶️';
     }
 }
 
@@ -261,17 +284,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // VINCULACIÓN DE BOTONES
     const nextBtn = document.getElementById('next-btn'); 
-    const prevBtn = document.getElementById('prev-btn');
+    const prevBtn = document.getElementById('prev-btn'); // Botón de Rebobinar
     const loadLyricsButton = document.getElementById('load-lyrics-btn');
     const startGameButton = document.getElementById('start-game-btn'); 
     const checkButton = document.getElementById('check-btn');
     const nextGameBtn = document.getElementById('next-game-btn'); 
     const userInput = document.getElementById('user-input');
     const toggleButton = document.getElementById('toggle-mode');
-    const focusedLineDiv = document.getElementById('focused-line');
     const focusPlayBtn = document.getElementById('focus-play-btn'); // Botón de Play/Pause
     const audioFileInput = document.getElementById('audio-file-input'); // Entrada de archivo
-    audioPlayer = document.getElementById('local-audio-player'); // Reproductor de audio
+    
+    // Inicializar la instancia de audio
+    audioPlayer = document.getElementById('local-audio-player'); 
 
     // Inicialización de datos
     loadLyrics();
@@ -279,8 +303,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Eventos de Navegación (Modo Enfoque)
     if (nextBtn) nextBtn.addEventListener('click', nextLine);
-    if (prevBtn) prevBtn.addEventListener('click', prevLine);
-    
+    if (prevBtn) prevBtn.addEventListener('click', rewindAndRepeat); // VINCULADO AL REBOBINADO
+
     // EVENTO DE CONTROL DE AUDIO
     if (focusPlayBtn) focusPlayBtn.addEventListener('click', togglePlayPause);
     
@@ -308,3 +332,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+🚀 Siguiente Paso: Prueba y Firebase
+
+Por favor, realiza los siguientes pasos para confirmar la utilidad:
+
+    Reemplaza los tres archivos en tu repositorio.
+
+    Limpia la caché (Ctrl + Shift + R).
+
+    Sube un MP3 y presiona el botón ▶️.
+
+    Avanza unas frases con ⏩.
+
+    Presiona el botón ⏪. El audio debe rebobinar y la letra debe regresar una línea.
+
+Si el botón ⏪ funciona como se espera, la aplicación es 100% útil y pasaremos inmediatamente a la Base de Datos en la Nube (Firebase).

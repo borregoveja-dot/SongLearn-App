@@ -96,7 +96,7 @@ function nextLine() {
     }
 }
 
-// NUEVA FUNCIÓN DE REBOBINADO Y REPETICIÓN DE FRASE (VINCULADA AL BOTÓN ⏪)
+// FUNCIÓN DE REBOBINADO Y REPETICIÓN DE FRASE (VINCULADA AL BOTÓN ⏪)
 function rewindAndRepeat() {
     const rewindSeconds = 5; // Cantidad de segundos a retroceder
 
@@ -107,8 +107,10 @@ function rewindAndRepeat() {
     }
     
     // 2. Rebobina el audio (solo si hay un reproductor cargado)
-    if (audioPlayer && audioPlayer.readyState >= 2) {
-        audioPlayer.currentTime -= rewindSeconds;
+    if (audioPlayer && audioPlayer.readyState >= 2) { 
+        
+        // La clave es no intentar retroceder más allá del inicio (segundo 0)
+        audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - rewindSeconds);
         
         // Asegura que el audio se reproduzca si estaba pausado
         if (audioPlayer.paused) {
@@ -116,7 +118,8 @@ function rewindAndRepeat() {
             const focusPlayBtn = document.getElementById('focus-play-btn');
             if (focusPlayBtn) focusPlayBtn.textContent = '⏸️'; 
         }
-    } else {
+    } else if (audioPlayer) {
+        // Mensaje específico si el archivo no se ha subido
         alert("El audio ha regresado. Sube un archivo de audio para escuchar la repetición.");
     }
 }
@@ -152,6 +155,13 @@ function handleFileInput(event) {
         // Reiniciar el botón a Play al cargar un nuevo archivo
         const focusPlayBtn = document.getElementById('focus-play-btn');
         if (focusPlayBtn) focusPlayBtn.textContent = '▶️';
+        
+        // Opcional: escuchar el evento 'canplay' para saber cuándo está listo el audio
+        if (audioPlayer) {
+            audioPlayer.addEventListener('canplay', () => {
+                console.log('Audio listo para reproducir y rebobinar.');
+            });
+        }
     }
 }
 
@@ -332,19 +342,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-🚀 Siguiente Paso: Prueba y Firebase
-
-Por favor, realiza los siguientes pasos para confirmar la utilidad:
-
-    Reemplaza los tres archivos en tu repositorio.
-
-    Limpia la caché (Ctrl + Shift + R).
-
-    Sube un MP3 y presiona el botón ▶️.
-
-    Avanza unas frases con ⏩.
-
-    Presiona el botón ⏪. El audio debe rebobinar y la letra debe regresar una línea.
-
-Si el botón ⏪ funciona como se espera, la aplicación es 100% útil y pasaremos inmediatamente a la Base de Datos en la Nube (Firebase).

@@ -136,6 +136,8 @@ function togglePlayPause() {
         return;
     }
     
+    // NOTA: El control de audio nativo se encarga de la reproducción,
+    // solo nos aseguramos de que el ícono de nuestro botón personalizado sea correcto.
     if (audioPlayer.paused) {
         audioPlayer.play();
         if (focusPlayBtn) focusPlayBtn.textContent = '⏸️'; // Pausa (Reproduciendo)
